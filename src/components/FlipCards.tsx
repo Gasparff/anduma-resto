@@ -17,11 +17,12 @@ export function FlipCards({ onElegir }: { onElegir?: (id: ServicioId) => void })
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {SERVICIOS.map((s) => (
+        {SERVICIOS.map((s, i) => (
           <div
             key={s.id}
             role="button"
             tabIndex={0}
+            style={{ "--i": i } as React.CSSProperties}
             aria-pressed={abierta === s.id}
             aria-label={`${s.nombre}: ${s.resumen}`}
             className={cn(
@@ -37,7 +38,7 @@ export function FlipCards({ onElegir }: { onElegir?: (id: ServicioId) => void })
             }}
           >
             <div className="flip-inner">
-              <div className="flip-face flex flex-col items-center justify-center gap-4 border bg-card p-6 text-center shadow-[var(--shadow-soft)]">
+              <div className="flip-face flip-glow flex flex-col items-center justify-center gap-4 border bg-card p-6 text-center">
                 <span className="flex size-20 items-center justify-center rounded-full bg-secondary text-primary dark:text-accent">
                   <IconoServicio id={s.id} className="size-9" />
                 </span>
@@ -45,7 +46,7 @@ export function FlipCards({ onElegir }: { onElegir?: (id: ServicioId) => void })
                 <p className="max-w-[22ch] text-sm text-muted-foreground">{s.resumen}</p>
               </div>
 
-              <div className="flip-back flip-face textura-cuero flex flex-col gap-3 p-6 text-[#f8eedb] shadow-[var(--shadow-lift)]">
+              <div className="flip-back flip-face flip-glow textura-cuero flex flex-col gap-3 p-6 text-[#f8eedb]">
                 <h3 className="text-xl">{s.nombre}</h3>
                 <p className="text-sm leading-relaxed text-[#f8eedb]/90">{s.descripcion}</p>
                 <ul className="space-y-1.5 text-sm">

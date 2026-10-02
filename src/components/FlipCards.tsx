@@ -37,7 +37,7 @@ export function FlipCards({ onElegir }: { onElegir?: (id: ServicioId) => void })
               }
             }}
           >
-            <div className="flip-interior flip-glow textura-cuero flex flex-col gap-2 p-4 text-[#f8eedb]">
+            <div className="flip-back flip-glow textura-cuero flex flex-col gap-2 p-4 text-[#f8eedb]">
               <h3 className="text-xl">{s.nombre}</h3>
               <ul className="space-y-1 text-xs leading-snug">
                 {s.incluye.map((i) => (
@@ -62,7 +62,7 @@ export function FlipCards({ onElegir }: { onElegir?: (id: ServicioId) => void })
               )}
             </div>
 
-            <div className="flip-tapa flip-glow flex flex-col items-center justify-center gap-3 border bg-card p-4 text-center">
+            <div className="flip-front flip-glow flex flex-col items-center justify-center gap-3 border bg-card p-4 text-center">
               <span className="flex size-14 items-center justify-center rounded-full bg-secondary text-primary dark:text-accent">
                 <IconoServicio id={s.id} className="size-7" />
               </span>

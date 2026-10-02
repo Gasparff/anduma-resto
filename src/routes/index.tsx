@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { PantallaCarga } from "@/components/PantallaCarga";
 import { Login } from "@/components/Login";
 import { VistaAnfitrion } from "@/components/VistaAnfitrion";
 import { VistaChef } from "@/components/VistaChef";
@@ -32,26 +33,27 @@ type Sesion = { rol: "chef" } | { rol: "anfitrion"; nombre: string; telefono: st
 function App() {
   const [sesion, setSesion] = useState<Sesion>(null);
 
-  if (!sesion) {
-    return (
-      <Login
-        onChef={() => setSesion({ rol: "chef" })}
-        onAnfitrion={(nombre, telefono) => setSesion({ rol: "anfitrion", nombre, telefono })}
-      />
-    );
-  }
-
   return (
-    <div className="animate-fade-in">
-      {sesion.rol === "chef" ? (
-        <VistaChef onSalir={() => setSesion(null)} />
-      ) : (
-        <VistaAnfitrion
-          nombre={sesion.nombre}
-          telefono={sesion.telefono}
-          onSalir={() => setSesion(null)}
+    <>
+      <PantallaCarga />
+      {!sesion ? (
+        <Login
+          onChef={() => setSesion({ rol: "chef" })}
+          onAnfitrion={(nombre, telefono) => setSesion({ rol: "anfitrion", nombre, telefono })}
         />
+      ) : (
+        <div className="animate-fade-in">
+          {sesion.rol === "chef" ? (
+            <VistaChef onSalir={() => setSesion(null)} />
+          ) : (
+            <VistaAnfitrion
+              nombre={sesion.nombre}
+              telefono={sesion.telefono}
+              onSalir={() => setSesion(null)}
+            />
+          )}
+        </div>
       )}
-    </div>
+    </>
   );
 }

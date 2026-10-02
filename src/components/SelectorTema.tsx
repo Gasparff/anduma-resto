@@ -1,18 +1,23 @@
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cambiarConOnda } from "@/lib/onda-tema";
 
 const CLAVE_TEMA = "anduma-tema";
 
 export function SelectorTema() {
-  const cambiarTema = () => {
-    const oscuro = document.documentElement.classList.toggle("dark");
-    const siguiente = oscuro ? "oscuro" : "claro";
-    document.documentElement.style.colorScheme = oscuro ? "dark" : "light";
-    try {
-      window.localStorage.setItem(CLAVE_TEMA, siguiente);
-    } catch {
-      // Sin almacenamiento: el cambio vale solo para esta visita.
-    }
+  const cambiarTema = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const raiz = document.documentElement;
+    const oscuroAlTerminar = !raiz.classList.contains("dark");
+    const aplicar = () => {
+      raiz.classList.toggle("dark", oscuroAlTerminar);
+      raiz.style.colorScheme = oscuroAlTerminar ? "dark" : "light";
+      try {
+        window.localStorage.setItem(CLAVE_TEMA, oscuroAlTerminar ? "oscuro" : "claro");
+      } catch {
+        // Sin almacenamiento: el cambio vale solo para esta visita.
+      }
+    };
+    cambiarConOnda(e.currentTarget, aplicar, oscuroAlTerminar);
   };
 
   return (

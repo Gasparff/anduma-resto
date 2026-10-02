@@ -20,11 +20,13 @@ import {
   salonSugerido,
   servicioPorId,
   soloDigitos,
+  telefonoWhatsapp,
   urlWhatsapp,
   useDatos,
   type SalonId,
   type ServicioId,
 } from "@/lib/eventos";
+import { avisarAlChef } from "@/lib/notificar";
 import { cn } from "@/lib/utils";
 
 const DIETAS = [
@@ -121,6 +123,13 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
     });
 
     const lugar = info.usaSalon ? ` en el ${SALONES[salon].nombre}` : "";
+    avisarAlChef({
+      titulo: `Pedido nuevo: ${info.singular}`,
+      mensaje: `${nombre} (${telefono}) pidió el ${formatearFecha(dia)} a las ${hora}${lugar}, para ${cantidad} ${info.unidad}.${
+        presupuesto ? ` Presupuesto: ${formatearPesos(presupuesto.total)}.` : ""
+      }`,
+      clic: urlWhatsapp(`Hola ${nombre}, recibí tu pedido.`, telefonoWhatsapp(telefono)),
+    });
     setEnviada(
       `Hola ${NEGOCIO.nombre}, soy ${nombre}. Acabo de enviar un pedido de ${info.singular.toLowerCase()} para el ${formatearFecha(
         dia,
@@ -295,7 +304,7 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
               </label>
 
               {presupuesto && (
-                <div className="rounded-xl bg-secondary px-4 py-3" aria-live="polite">
+                <div className="aparece-abajo rounded-xl bg-secondary px-4 py-3" aria-live="polite">
                   <p className="flex items-baseline justify-between gap-3">
                     <span className="font-medium">Presupuesto estimado</span>
                     <span className="font-display text-xl">
@@ -312,12 +321,15 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
               )}
 
               {error && (
-                <p role="alert" className="text-sm text-destructive">
+                <p role="alert" className="aparece-abajo text-sm text-destructive">
                   {error}
                 </p>
               )}
               {enviada && (
-                <div role="status" className="space-y-2 rounded-xl bg-success/10 p-3 text-success">
+                <div
+                  role="status"
+                  className="aparece-abajo space-y-2 rounded-xl bg-success/10 p-3 text-success"
+                >
                   <p className="font-medium">¡Listo! Tu pedido quedó pendiente de confirmación.</p>
                   <a
                     href={urlWhatsapp(enviada)}

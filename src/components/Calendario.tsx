@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { SALONES, aISO, hoyISO, salonOcupado, type Evento, type SalonId } from "@/lib/eventos";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +28,14 @@ export function Calendario({
   salon = null,
 }: Props) {
   const hoy = hoyISO();
+
+  // Dirección del cambio de mes, para que la grilla se deslice hacia donde se navega.
+  const mesAnterior = useRef(mes);
+  const sentido = useRef<"sig" | "ant">("sig");
+  if (mes.getTime() !== mesAnterior.current.getTime()) {
+    sentido.current = mes > mesAnterior.current ? "sig" : "ant";
+    mesAnterior.current = mes;
+  }
 
   const celdas = useMemo(() => {
     const primero = new Date(mes.getFullYear(), mes.getMonth(), 1);
@@ -80,7 +88,13 @@ export function Calendario({
         ))}
       </div>
 
-      <div className="mt-2 grid grid-cols-7 gap-1.5 sm:gap-2">
+      <div
+        key={mes.getTime()}
+        className={cn(
+          "mt-2 grid grid-cols-7 gap-1.5 sm:gap-2",
+          sentido.current === "sig" ? "mes-sig" : "mes-ant",
+        )}
+      >
         {celdas.map((iso, i) => {
           if (!iso) return <div key={`v-${i}`} />;
           const delDia = porDia.get(iso) ?? [];
@@ -112,7 +126,7 @@ export function Calendario({
                 modo === "anfitrion" && ocupadoEnSalon && "bg-destructive/10",
                 modo === "chef" && delDia.length > 0 && "bg-primary/10",
                 iso === hoy && "ring-1 ring-gold/70",
-                diaSeleccionado === iso && "bg-primary/30 shadow-[var(--shadow-soft)]",
+                diaSeleccionado === iso && "dia-pop bg-primary/30 shadow-[var(--shadow-soft)]",
               )}
             >
               <span className="font-normal">{numero}</span>

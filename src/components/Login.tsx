@@ -2,7 +2,9 @@ import { Instagram, MapPin, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { Marca } from "@/components/Marca";
 import { SelectorTema } from "@/components/SelectorTema";
+import { iniciarSesionChef } from "@/lib/backend";
 import { NEGOCIO, soloDigitos, urlWhatsapp } from "@/lib/eventos";
+import { resolverModo, useModoBackend } from "@/lib/supabase";
 
 type Props = {
   onChef: () => void;
@@ -19,6 +21,9 @@ export function Login({ onChef, onAnfitrion }: Props) {
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
   const [error, setError] = useState("");
+  const [entrando, setEntrando] = useState(false);
+  // Con la base conectada el chef entra con su correo; en modo demostración, con admin/admin.
+  const conBase = useModoBackend() === "remoto";
 
   function elegir(siguiente: "chef" | "anfitrion") {
     setModo(siguiente);
@@ -114,12 +119,26 @@ export function Login({ onChef, onAnfitrion }: Props) {
           {modo === "chef" && (
             <form
               className="space-y-3"
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
+                if (entrando) return;
                 if (!usuario.trim() || !clave.trim()) {
-                  setError("Completá usuario y contraseña.");
+                  setError(
+                    conBase ? "Completá correo y contraseña." : "Completá usuario y contraseña.",
+                  );
                   return;
                 }
+                setEntrando(true);
+                setError("");
+                const modoActual = await resolverModo();
+                if (modoActual === "remoto") {
+                  const problema = await iniciarSesionChef(usuario, clave);
+                  setEntrando(false);
+                  if (problema) return setError(problema);
+                  onChef();
+                  return;
+                }
+                setEntrando(false);
                 if (usuario.trim() === "admin" && clave === "admin") {
                   onChef();
                   return;
@@ -129,13 +148,14 @@ export function Login({ onChef, onAnfitrion }: Props) {
             >
               <h2 className="text-2xl">Acceso del restaurante</h2>
               <p className="pb-2 text-sm text-muted-foreground">
-                Ingresá con tu usuario y contraseña.
+                Ingresá con tu {conBase ? "correo" : "usuario"} y contraseña.
               </p>
               <Campo
-                label="Usuario"
+                label={conBase ? "Correo" : "Usuario"}
                 value={usuario}
                 onChange={setUsuario}
-                placeholder="Tu usuario"
+                {...(conBase ? { type: "email" } : {})}
+                placeholder={conBase ? "tu@correo.com" : "Tu usuario"}
                 autoFocus
               />
               <Campo
@@ -146,8 +166,8 @@ export function Login({ onChef, onAnfitrion }: Props) {
                 placeholder="Tu contraseña"
               />
               {error && <MensajeError texto={error} />}
-              <button type="submit" className={BOTON_PRIMARIO}>
-                Ingresar
+              <button type="submit" disabled={entrando} className={BOTON_PRIMARIO}>
+                {entrando ? "Ingresando…" : "Ingresar"}
               </button>
               <Volver onClick={() => setModo("inicio")} />
             </form>

@@ -29,7 +29,8 @@ const CAMPO =
   "w-full rounded-xl border bg-background px-4 py-2.5 outline-none placeholder:text-muted-foreground/70 focus-visible:ring-2 focus-visible:ring-ring";
 
 export function VistaChef({ onSalir }: { onSalir: () => void }) {
-  const { datos, agregarEvento, eliminarEvento, responderSolicitud, reiniciarDemo } = useDatos();
+  const { datos, modo, agregarEvento, eliminarEvento, responderSolicitud, reiniciarDemo } =
+    useDatos("chef");
   const [mes, setMes] = useState(() => new Date());
   const [dia, setDia] = useState<string | null>(null);
   const [nombre, setNombre] = useState("");
@@ -50,7 +51,7 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
     setHora(servicioPorId(id).horaSugerida);
   }
 
-  function guardar(e: React.FormEvent) {
+  async function guardar(e: React.FormEvent) {
     e.preventDefault();
     if (!dia) return;
     const cantidad = Number(personas);
@@ -68,7 +69,7 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
     if (info.usaSalon && salonOcupado(datos.eventos, dia, salon))
       return setError(`El ${SALONES[salon].nombre} ya tiene un evento ese día.`);
 
-    agregarEvento({
+    const problema = await agregarEvento({
       fecha: dia,
       nombre: nombre.trim(),
       personas: cantidad,
@@ -76,13 +77,14 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
       hora,
       salon: info.usaSalon ? salon : undefined,
     });
+    if (problema) return setError(problema);
     setNombre("");
     setPersonas("");
     setError("");
   }
 
-  function responder(s: Solicitud, estado: "confirmada" | "rechazada") {
-    const problema = responderSolicitud(s.id, estado);
+  async function responder(s: Solicitud, estado: "confirmada" | "rechazada") {
+    const problema = await responderSolicitud(s.id, estado);
     setAvisos((prev) => {
       const siguiente = { ...prev };
       if (problema) siguiente[s.id] = problema;
@@ -156,7 +158,7 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
                       </div>
                       <button
                         type="button"
-                        onClick={() => eliminarEvento(ev.id)}
+                        onClick={() => void eliminarEvento(ev.id)}
                         className="boton-anim rounded-full px-2 py-1 text-sm text-destructive hover:bg-destructive/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                         aria-label={`Eliminar ${ev.nombre}`}
                       >
@@ -318,35 +320,37 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-dashed p-5 text-sm">
-          <h2 className="text-lg">Modo demostración</h2>
-          <p className="mt-1 max-w-[60ch] text-muted-foreground">
-            Estos datos son de ejemplo y se guardan solo en este dispositivo. Antes de mostrar la
-            aplicación, podés volver a cargarlos.
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              if (!confirmaReinicio) {
-                setConfirmaReinicio(true);
-                window.setTimeout(() => setConfirmaReinicio(false), 4000);
-                return;
-              }
-              reiniciarDemo();
-              setDia(null);
-              setAvisos({});
-              setConfirmaReinicio(false);
-            }}
-            className={cn(
-              "boton-anim mt-3 rounded-full border px-4 py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-              confirmaReinicio
-                ? "border-destructive bg-destructive/10 text-destructive"
-                : "hover:bg-secondary",
-            )}
-          >
-            {confirmaReinicio ? "Tocá de nuevo para confirmar" : "Cargar datos de ejemplo"}
-          </button>
-        </section>
+        {modo === "local" && (
+          <section className="rounded-3xl border border-dashed p-5 text-sm">
+            <h2 className="text-lg">Modo demostración</h2>
+            <p className="mt-1 max-w-[60ch] text-muted-foreground">
+              Estos datos son de ejemplo y se guardan solo en este dispositivo. Antes de mostrar la
+              aplicación, podés volver a cargarlos.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                if (!confirmaReinicio) {
+                  setConfirmaReinicio(true);
+                  window.setTimeout(() => setConfirmaReinicio(false), 4000);
+                  return;
+                }
+                reiniciarDemo();
+                setDia(null);
+                setAvisos({});
+                setConfirmaReinicio(false);
+              }}
+              className={cn(
+                "boton-anim mt-3 rounded-full border px-4 py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                confirmaReinicio
+                  ? "border-destructive bg-destructive/10 text-destructive"
+                  : "hover:bg-secondary",
+              )}
+            >
+              {confirmaReinicio ? "Tocá de nuevo para confirmar" : "Cargar datos de ejemplo"}
+            </button>
+          </section>
+        )}
       </main>
 
       <PieContacto />

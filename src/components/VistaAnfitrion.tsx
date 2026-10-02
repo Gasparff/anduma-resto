@@ -44,7 +44,8 @@ const CAMPO =
 type Props = { nombre: string; telefono: string; onSalir: () => void };
 
 export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
-  const { datos, crearSolicitud } = useDatos();
+  const { datos, crearSolicitud } = useDatos("anfitrion");
+  const [enviando, setEnviando] = useState(false);
   const [mes, setMes] = useState(() => new Date());
   const [dia, setDia] = useState<string | null>(null);
   const [servicio, setServicio] = useState<ServicioId>("cumpleanos");
@@ -92,8 +93,9 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
     if (info.usaSalon && n > SALONES[salon].capacidad) cambiarSalon(salonSugerido(n));
   }
 
-  function enviar(e: React.FormEvent) {
+  async function enviar(e: React.FormEvent) {
     e.preventDefault();
+    if (enviando) return;
     setEnviada(null);
     if (!dia) return setError("Elegí primero un día libre en el calendario.");
     if (!cantidad || cantidad < 1) return setError(`Indicá la cantidad de ${info.unidad}.`);
@@ -109,7 +111,8 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
     if (info.usaSalon && salonOcupado(datos.eventos, dia, salon))
       return setError("Ese salón ya está ocupado ese día.");
 
-    crearSolicitud({
+    setEnviando(true);
+    const problema = await crearSolicitud({
       anfitrion: nombre,
       telefono,
       fecha: dia,
@@ -121,6 +124,8 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
       dietas,
       presupuesto: presupuesto?.total,
     });
+    setEnviando(false);
+    if (problema) return setError(problema);
 
     const lugar = info.usaSalon ? ` en el ${SALONES[salon].nombre}` : "";
     avisarAlChef({
@@ -345,9 +350,10 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
 
               <button
                 type="submit"
+                disabled={enviando}
                 className="boton-anim w-full rounded-2xl bg-primary px-4 py-3 font-medium text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
-                Enviar pedido
+                {enviando ? "Enviando…" : "Enviar pedido"}
               </button>
             </form>
 

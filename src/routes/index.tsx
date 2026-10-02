@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PantallaCarga } from "@/components/PantallaCarga";
 import { Login } from "@/components/Login";
 import { VistaAnfitrion } from "@/components/VistaAnfitrion";
 import { VistaChef } from "@/components/VistaChef";
+import { cerrarSesionChef, chefConSesion } from "@/lib/backend";
+import { resolverModo } from "@/lib/supabase";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -33,6 +35,24 @@ type Sesion = { rol: "chef" } | { rol: "anfitrion"; nombre: string; telefono: st
 function App() {
   const [sesion, setSesion] = useState<Sesion>(null);
 
+  // Con la base conectada, si el chef ya había iniciado sesión en este dispositivo entra directo.
+  useEffect(() => {
+    let vigente = true;
+    void resolverModo().then(async (modo) => {
+      if (modo === "remoto" && (await chefConSesion()) && vigente) {
+        setSesion((actual) => actual ?? { rol: "chef" });
+      }
+    });
+    return () => {
+      vigente = false;
+    };
+  }, []);
+
+  function salir() {
+    if (sesion?.rol === "chef") void cerrarSesionChef();
+    setSesion(null);
+  }
+
   return (
     <>
       <PantallaCarga />
@@ -44,13 +64,9 @@ function App() {
       ) : (
         <div className="animate-fade-in">
           {sesion.rol === "chef" ? (
-            <VistaChef onSalir={() => setSesion(null)} />
+            <VistaChef onSalir={salir} />
           ) : (
-            <VistaAnfitrion
-              nombre={sesion.nombre}
-              telefono={sesion.telefono}
-              onSalir={() => setSesion(null)}
-            />
+            <VistaAnfitrion nombre={sesion.nombre} telefono={sesion.telefono} onSalir={salir} />
           )}
         </div>
       )}

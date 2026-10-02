@@ -1,10 +1,22 @@
 /**
- * DEMO SIN BACKEND REAL.
- * Toda la información (eventos y solicitudes) se guarda en el localStorage del
- * navegador, así que el chef y el anfitrión ven los mismos datos solo si usan
- * el mismo dispositivo. El siguiente paso es migrar esto a una base de datos.
+ * Datos de la app: eventos y solicitudes.
+ *
+ * Si la base de Supabase está lista (ver supabase/ y docs/BACKEND.md), los datos viven ahí y
+ * los ven todos los dispositivos. Si todavía no, la app funciona en MODO DEMOSTRACIÓN: guarda
+ * todo en el localStorage del navegador y chef y anfitrión solo comparten datos si usan el
+ * mismo dispositivo. `useDatos` elige solo entre los dos modos.
  */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  agregarEventoRemoto,
+  cargarOcupadas,
+  cargarPanelChef,
+  crearSolicitudRemota,
+  eliminarEventoRemoto,
+  estadoDePedidos,
+  responderSolicitudRemota,
+} from "@/lib/backend";
+import { useModoBackend, type ModoBackend } from "@/lib/supabase";
 
 /* ------------------------------------------------------------------ */
 /* Datos del restaurante                                               */
@@ -402,7 +414,7 @@ function guardar(datos: Datos) {
   window.dispatchEvent(new CustomEvent(SYNC_EVENT));
 }
 
-export function useDatos() {
+function useDatosLocales() {
   const [datos, setDatos] = useState<Datos>({ eventos: [], solicitudes: [] });
 
   useEffect(() => {
@@ -504,5 +516,182 @@ export function useDatos() {
     crearSolicitud,
     responderSolicitud,
     reiniciarDemo,
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Modo base de datos                                                  */
+/* ------------------------------------------------------------------ */
+
+const CLAVE_MIS_PEDIDOS = "anduma-mis-pedidos-v1";
+const MAX_MIS_PEDIDOS = 50;
+
+/** Los pedidos que hizo este dispositivo (el anfitrión no tiene cuenta, así que se recuerdan acá). */
+function leerMisPedidos(): Solicitud[] {
+  try {
+    const raw = window.localStorage.getItem(CLAVE_MIS_PEDIDOS);
+    const parsed = raw ? (JSON.parse(raw) as unknown) : [];
+    return Array.isArray(parsed) ? (parsed as Solicitud[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function guardarMisPedidos(pedidos: Solicitud[]) {
+  try {
+    window.localStorage.setItem(CLAVE_MIS_PEDIDOS, JSON.stringify(pedidos.slice(-MAX_MIS_PEDIDOS)));
+  } catch {
+    // Sin almacenamiento: el pedido igual quedó guardado en la base.
+  }
+}
+
+const REFRESCO_MS = 15000;
+const DATOS_VACIOS: Datos = { eventos: [], solicitudes: [] };
+
+function useDatosRemotos(rol: Rol, activo: boolean) {
+  const [datos, setDatos] = useState<Datos>(DATOS_VACIOS);
+
+  const refrescar = useCallback(async () => {
+    if (!activo) return;
+    try {
+      if (rol === "chef") {
+        setDatos(await cargarPanelChef());
+        return;
+      }
+      const mios = leerMisPedidos();
+      const [eventos, estados] = await Promise.all([
+        cargarOcupadas(),
+        estadoDePedidos(mios.map((m) => m.id)),
+      ]);
+      const solicitudes = mios.map((m) => ({ ...m, estado: estados.get(m.id) ?? m.estado }));
+      guardarMisPedidos(solicitudes);
+      setDatos({ eventos, solicitudes });
+    } catch {
+      // Sin conexión o sesión vencida: se mantienen los últimos datos mostrados.
+    }
+  }, [activo, rol]);
+
+  // Carga inicial, refresco periódico y al volver a la pestaña.
+  useEffect(() => {
+    if (!activo) return;
+    void refrescar();
+    const timer = window.setInterval(() => void refrescar(), REFRESCO_MS);
+    const alVolver = () => {
+      if (document.visibilityState === "visible") void refrescar();
+    };
+    document.addEventListener("visibilitychange", alVolver);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", alVolver);
+    };
+  }, [activo, refrescar]);
+
+  const agregarEvento = useCallback(
+    async (evento: Omit<Evento, "id">) => {
+      const error = await agregarEventoRemoto(evento);
+      await refrescar();
+      return error;
+    },
+    [refrescar],
+  );
+
+  const eliminarEvento = useCallback(
+    async (id: string) => {
+      const error = await eliminarEventoRemoto(id);
+      await refrescar();
+      return error;
+    },
+    [refrescar],
+  );
+
+  const crearSolicitud = useCallback(
+    async (solicitud: Omit<Solicitud, "id" | "estado" | "creada">) => {
+      const res = await crearSolicitudRemota(solicitud);
+      if ("error" in res) return res.error;
+      guardarMisPedidos([
+        ...leerMisPedidos(),
+        { ...solicitud, id: res.id, estado: "pendiente", creada: new Date().toISOString() },
+      ]);
+      await refrescar();
+      return null;
+    },
+    [refrescar],
+  );
+
+  const responderSolicitud = useCallback(
+    async (id: string, estado: Exclude<EstadoSolicitud, "pendiente">) => {
+      const error = await responderSolicitudRemota(id, estado);
+      await refrescar();
+      return error;
+    },
+    [refrescar],
+  );
+
+  return { datos, agregarEvento, eliminarEvento, crearSolicitud, responderSolicitud };
+}
+
+/* ------------------------------------------------------------------ */
+/* Hook que usan las pantallas                                         */
+/* ------------------------------------------------------------------ */
+
+export type Rol = "chef" | "anfitrion";
+
+/** Todas las acciones devuelven un mensaje de error, o null si salió bien. */
+export type AccionesDatos = {
+  agregarEvento: (evento: Omit<Evento, "id">) => Promise<string | null>;
+  eliminarEvento: (id: string) => Promise<string | null>;
+  crearSolicitud: (s: Omit<Solicitud, "id" | "estado" | "creada">) => Promise<string | null>;
+  responderSolicitud: (
+    id: string,
+    estado: Exclude<EstadoSolicitud, "pendiente">,
+  ) => Promise<string | null>;
+  /** Solo existe en modo demostración. */
+  reiniciarDemo: () => void;
+};
+
+export function useDatos(
+  rol: Rol = "anfitrion",
+): AccionesDatos & { datos: Datos; modo: ModoBackend } {
+  const modo = useModoBackend();
+  const local = useDatosLocales();
+  const remoto = useDatosRemotos(rol, modo === "remoto");
+  // La referencia evita que las acciones cambien de identidad en cada render.
+  const localRef = useRef(local);
+  localRef.current = local;
+
+  if (modo === "remoto") {
+    return { modo, ...remoto, reiniciarDemo: () => {} };
+  }
+
+  if (modo === "cargando") {
+    const pendiente = async () => "Un momento, estamos conectando.";
+    return {
+      modo,
+      datos: DATOS_VACIOS,
+      agregarEvento: pendiente,
+      eliminarEvento: pendiente,
+      crearSolicitud: pendiente,
+      responderSolicitud: pendiente,
+      reiniciarDemo: () => {},
+    };
+  }
+
+  return {
+    modo,
+    datos: local.datos,
+    agregarEvento: async (e) => {
+      localRef.current.agregarEvento(e);
+      return null;
+    },
+    eliminarEvento: async (id) => {
+      localRef.current.eliminarEvento(id);
+      return null;
+    },
+    crearSolicitud: async (s) => {
+      localRef.current.crearSolicitud(s);
+      return null;
+    },
+    responderSolicitud: async (id, estado) => localRef.current.responderSolicitud(id, estado),
+    reiniciarDemo: () => localRef.current.reiniciarDemo(),
   };
 }

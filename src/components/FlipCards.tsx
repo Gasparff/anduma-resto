@@ -34,7 +34,7 @@ export function FlipCards({ onElegir }: { onElegir?: (id: ServicioId) => void })
             aria-pressed={abierta === s.id}
             aria-label={`${s.nombre}: ${s.resumen}`}
             className={cn(
-              "flip-scene h-[15rem] cursor-pointer rounded-3xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring",
+              "flip-scene h-[12.5rem] cursor-pointer sm:h-[15rem] rounded-3xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring",
               abierta === s.id && "is-flipped",
             )}
             onPointerEnter={(e) => {

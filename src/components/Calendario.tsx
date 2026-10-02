@@ -108,10 +108,7 @@ export function Calendario({
                 "hover:bg-secondary/70",
                 pasado && "opacity-35",
                 bloqueado && "cursor-not-allowed hover:bg-transparent",
-                modo === "anfitrion" &&
-                  !pasado &&
-                  !ocupadoEnSalon &&
-                  "bg-success/10",
+                modo === "anfitrion" && !pasado && !ocupadoEnSalon && "bg-success/10",
                 modo === "anfitrion" && ocupadoEnSalon && "bg-destructive/10",
                 modo === "chef" && delDia.length > 0 && "bg-primary/10",
                 iso === hoy && "ring-1 ring-gold/70",

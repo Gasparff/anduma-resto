@@ -39,6 +39,15 @@ export function telefonoWhatsapp(valor: string) {
   let d = soloDigitos(valor).replace(/^0+/, "");
   if (d.startsWith("54")) return d;
   if (d.startsWith("15")) d = d.slice(2);
+  // Formato "característica + 15 + número" (ej. 03573 15 46-8600): saca el 15 del medio.
+  if (d.length === 12) {
+    for (const k of [2, 3, 4]) {
+      if (d.slice(k, k + 2) === "15") {
+        d = d.slice(0, k) + d.slice(k + 2);
+        break;
+      }
+    }
+  }
   return d.length === 10 ? `549${d}` : d;
 }
 

@@ -34,7 +34,7 @@ Reglas de negocio: cada salón admite un evento por día; las viandas no ocupan 
 
 ## Stack técnico
 
-- Proyecto creado con **Lovable** (React + TanStack Start + Vite + Tailwind + shadcn/ui). Repo en GitHub: `Gasparff/picture-match-up` (privado).
+- Proyecto creado con **Lovable** (React + TanStack Start + Vite + Tailwind + shadcn/ui). Repo en GitHub: `Gasparff/anduma-resto` (privado). `master` es el respaldo de la demo v1.
 - Carpeta de trabajo en mi PC: `C:\Users\Administrator\Desktop\AndumaResto`. Puerto de desarrollo: 8080 (`npm run dev -- --host`).
 - Archivos clave en `src/`:
   - `lib/eventos.ts`: datos del negocio, servicios, salones, lógica de reservas y datos de ejemplo. **Acá se cambian precios, capacidades y contacto.**

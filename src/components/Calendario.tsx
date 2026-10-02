@@ -49,13 +49,13 @@ export function Calendario({
   }, [eventos]);
 
   return (
-    <div className="rounded-3xl border bg-card p-4 shadow-[var(--shadow-soft)] sm:p-6">
+    <div className="rounded-[2rem] border border-border/40 bg-card p-5 shadow-[var(--shadow-soft)] sm:p-7">
       <div className="mb-4 flex items-center justify-between gap-3">
         <button
           type="button"
           onClick={() => onCambiarMes(-1)}
           aria-label="Mes anterior"
-          className="rounded-full border px-3 py-1.5 text-sm transition-colors hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          className="flex size-9 items-center justify-center rounded-full bg-secondary/60 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           ←
         </button>
@@ -66,13 +66,13 @@ export function Calendario({
           type="button"
           onClick={() => onCambiarMes(1)}
           aria-label="Mes siguiente"
-          className="rounded-full border px-3 py-1.5 text-sm transition-colors hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          className="flex size-9 items-center justify-center rounded-full bg-secondary/60 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           →
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-muted-foreground">
+      <div className="grid grid-cols-7 gap-1 text-center text-[0.7rem] font-normal uppercase tracking-wider text-muted-foreground/70">
         {DIAS.map((d) => (
           <div key={d} className="py-1">
             {d}
@@ -80,7 +80,7 @@ export function Calendario({
         ))}
       </div>
 
-      <div className="mt-1 grid grid-cols-7 gap-1 sm:gap-2">
+      <div className="mt-2 grid grid-cols-7 gap-1.5 sm:gap-2">
         {celdas.map((iso, i) => {
           if (!iso) return <div key={`v-${i}`} />;
           const delDia = porDia.get(iso) ?? [];
@@ -104,22 +104,22 @@ export function Calendario({
               aria-label={`${numero}, ${estado}`}
               aria-pressed={diaSeleccionado === iso}
               className={cn(
-                "relative flex aspect-square flex-col items-center justify-center rounded-xl border text-sm transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-                "hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft)]",
-                pasado && "opacity-45",
-                bloqueado && "cursor-not-allowed hover:translate-y-0 hover:shadow-none",
+                "relative flex aspect-square flex-col items-center justify-center rounded-full border border-transparent text-sm transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                "hover:bg-secondary/70",
+                pasado && "opacity-35",
+                bloqueado && "cursor-not-allowed hover:bg-transparent",
                 modo === "anfitrion" &&
                   !pasado &&
                   !ocupadoEnSalon &&
-                  "border-success/50 bg-success/10",
-                modo === "anfitrion" && ocupadoEnSalon && "border-destructive/50 bg-destructive/10",
-                modo === "chef" && delDia.length > 0 && "border-primary/50 bg-primary/10",
-                iso === hoy && "ring-2 ring-gold",
-                diaSeleccionado === iso && "border-primary bg-primary/25",
+                  "bg-success/10",
+                modo === "anfitrion" && ocupadoEnSalon && "bg-destructive/10",
+                modo === "chef" && delDia.length > 0 && "bg-primary/10",
+                iso === hoy && "ring-1 ring-gold/70",
+                diaSeleccionado === iso && "bg-primary/30 shadow-[var(--shadow-soft)]",
               )}
             >
-              <span className="font-medium">{numero}</span>
-              <span className="mt-1 flex h-1.5 gap-1">
+              <span className="font-normal">{numero}</span>
+              <span className="mt-0.5 flex h-1.5 gap-0.5">
                 {modo === "chef" &&
                   (["eventos", "resto"] as SalonId[]).map(
                     (s) =>

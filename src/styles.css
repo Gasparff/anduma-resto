@@ -169,7 +169,9 @@
     font-variant-numeric: lining-nums;
     background-image: var(--body-decoration);
     background-attachment: fixed;
-    transition: background-color 200ms ease, color 200ms ease;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
   }
 
   h1,
@@ -212,8 +214,8 @@
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   transition:
-    transform 0.5s ease,
-    box-shadow 0.4s ease;
+    transform 0.75s cubic-bezier(0.34, 1.45, 0.5, 1),
+    box-shadow 0.5s ease;
 }
 
 .flip-front {
@@ -233,17 +235,30 @@
   transform: rotateY(0);
 }
 
-/* Glow chico, en el color de acento; se intensifica al pasar o dar vuelta */
-.flip-glow {
+/* Sombra de las tarjetas (sin glow): suave en reposo, más profunda y larga al dar vuelta */
+.flip-sombra {
   box-shadow:
-    var(--shadow-soft),
-    0 0 14px -2px color-mix(in oklab, var(--accent) 45%, transparent);
+    0 1px 2px rgb(0 0 0 / 0.14),
+    0 6px 14px -4px rgb(0 0 0 / 0.28);
 }
 
-.flip-scene.is-flipped .flip-glow {
+.flip-scene.is-flipped .flip-sombra {
   box-shadow:
-    var(--shadow-lift),
-    0 0 22px 0 color-mix(in oklab, var(--accent) 65%, transparent);
+    0 2px 4px rgb(0 0 0 / 0.16),
+    0 18px 30px -8px rgb(0 0 0 / 0.5);
+}
+
+/* Elevación tipo motion: la tarjeta se levanta y crece un poco mientras gira, con rebote al llegar.
+   Se usan `translate` y `scale` (no `transform`) para no pisar la animación de entrada ni el giro. */
+.flip-scene {
+  transition:
+    translate 0.75s cubic-bezier(0.34, 1.45, 0.5, 1),
+    scale 0.75s cubic-bezier(0.34, 1.45, 0.5, 1);
+}
+
+.flip-scene.is-flipped {
+  translate: 0 -6px;
+  scale: 1.04;
 }
 
 /* Textura de cuero/tierra, inspirada en el fondo del logo */

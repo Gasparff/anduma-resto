@@ -18,7 +18,7 @@ export function FlipCards({ onElegir }: { onElegir?: (id: ServicioId) => void })
   return (
     <section className="space-y-4">
       <div>
-        <h2 className="text-2xl sm:text-3xl">Qué cocinamos para vos</h2>
+        <h2 className="text-2xl sm:text-3xl">Nuestros servicios</h2>
         <p className="text-sm text-muted-foreground">
           Tocá una tarjeta para ver qué incluye cada servicio.
         </p>

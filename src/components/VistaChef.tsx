@@ -1,3 +1,4 @@
+import { Desplegable } from "@/components/Desplegable";
 import { MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { Calendario } from "@/components/Calendario";
@@ -174,31 +175,23 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
                     aria-label="Nombre del evento"
                     className={CAMPO}
                   />
-                  <select
+                  <Desplegable
                     value={servicio}
-                    onChange={(e) => cambiarServicio(e.target.value as ServicioId)}
-                    aria-label="Servicio"
-                    className={CAMPO}
-                  >
-                    {SERVICIOS.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.nombre}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={cambiarServicio}
+                    ariaLabel="Servicio"
+                    opciones={SERVICIOS.map((s) => ({ valor: s.id, texto: s.nombre }))}
+                  />
                   {info.usaSalon && (
-                    <select
+                    <Desplegable
                       value={salon}
-                      onChange={(e) => setSalon(e.target.value as SalonId)}
-                      aria-label="Salón"
-                      className={CAMPO}
-                    >
-                      {LISTA_SALONES.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.nombre} (hasta {s.capacidad})
-                        </option>
-                      ))}
-                    </select>
+                      onChange={setSalon}
+                      ariaLabel="Salón"
+                      className="aparece-abajo"
+                      opciones={LISTA_SALONES.map((s) => ({
+                        valor: s.id,
+                        texto: `${s.nombre} (hasta ${s.capacidad})`,
+                      }))}
+                    />
                   )}
                   <div className="grid grid-cols-2 gap-3">
                     <input

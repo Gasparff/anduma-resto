@@ -1,6 +1,7 @@
 import { MessageCircle } from "lucide-react";
 import { useRef, useState } from "react";
 import { Calendario } from "@/components/Calendario";
+import { Desplegable } from "@/components/Desplegable";
 import { Encabezado } from "@/components/Encabezado";
 import { FlipCards } from "@/components/FlipCards";
 import { PieContacto } from "@/components/PieContacto";
@@ -186,23 +187,18 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
             </p>
 
             <form noValidate onSubmit={enviar} className="mt-4 space-y-3 text-sm">
-              <label className="block">
+              <div className="block">
                 <span className="mb-1 block font-medium">Servicio</span>
-                <select
+                <Desplegable
                   value={servicio}
-                  onChange={(e) => cambiarServicio(e.target.value as ServicioId)}
-                  className={CAMPO}
-                >
-                  {SERVICIOS.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.nombre}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                  onChange={cambiarServicio}
+                  ariaLabel="Servicio"
+                  opciones={SERVICIOS.map((s) => ({ valor: s.id, texto: s.nombre }))}
+                />
+              </div>
 
               {info.usaSalon && (
-                <fieldset>
+                <fieldset className="aparece-abajo">
                   <legend className="mb-1 font-medium">Salón</legend>
                   <div className="grid gap-2 sm:grid-cols-2">
                     {LISTA_SALONES.map((s) => {

@@ -264,6 +264,58 @@
   animation: flip-blur 0.5s cubic-bezier(0.45, 0, 0.55, 1);
 }
 
+/* Desplegables y bloques que aparecen: deslizamiento suave hacia abajo */
+@keyframes desplegar-abajo {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scaleY(0.94);
+    clip-path: inset(0 0 100% 0 round 12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 0 0 0 round 12px);
+  }
+}
+
+@keyframes plegar-arriba {
+  from {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 0 0 0 round 12px);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.96);
+    clip-path: inset(0 0 40% 0 round 12px);
+  }
+}
+
+@keyframes aparecer-abajo {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.desplegable-abajo[data-state="open"][data-side] {
+  transform-origin: top center;
+  animation: desplegar-abajo 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.desplegable-abajo[data-state="closed"][data-side] {
+  transform-origin: top center;
+  animation: plegar-arriba 0.16s ease-in both;
+}
+
+.aparece-abajo {
+  animation: aparecer-abajo 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
 /* Textura de cuero/tierra, inspirada en el fondo del logo */
 .textura-cuero {
   background-color: #6b3a24;
@@ -463,6 +515,18 @@
   .flip-scene.is-girando .flip-front,
   .flip-scene.is-girando .flip-back {
     animation-duration: 0.5s !important;
+  }
+
+  .desplegable-abajo[data-state="open"][data-side] {
+    animation-duration: 0.3s !important;
+  }
+
+  .desplegable-abajo[data-state="closed"][data-side] {
+    animation-duration: 0.16s !important;
+  }
+
+  .aparece-abajo {
+    animation-duration: 0.35s !important;
   }
 }
 

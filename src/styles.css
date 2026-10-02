@@ -214,7 +214,7 @@
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   transition:
-    transform 0.75s cubic-bezier(0.34, 1.45, 0.5, 1),
+    transform 0.5s cubic-bezier(0.45, 0, 0.55, 1),
     box-shadow 0.5s ease;
 }
 
@@ -246,19 +246,6 @@
   box-shadow:
     0 2px 4px rgb(0 0 0 / 0.16),
     0 18px 30px -8px rgb(0 0 0 / 0.5);
-}
-
-/* Elevación tipo motion: la tarjeta se levanta y crece un poco mientras gira, con rebote al llegar.
-   Se usan `translate` y `scale` (no `transform`) para no pisar la animación de entrada ni el giro. */
-.flip-scene {
-  transition:
-    translate 0.75s cubic-bezier(0.34, 1.45, 0.5, 1),
-    scale 0.75s cubic-bezier(0.34, 1.45, 0.5, 1);
-}
-
-.flip-scene.is-flipped {
-  translate: 0 -6px;
-  scale: 1.04;
 }
 
 /* Textura de cuero/tierra, inspirada en el fondo del logo */
@@ -450,12 +437,11 @@
 @media (prefers-reduced-motion: reduce) {
   .flip-scene {
     animation-duration: 0.8s !important;
-    transition-duration: 0.75s !important;
   }
 
   .flip-front,
   .flip-back {
-    transition-duration: 0.75s, 0.5s !important;
+    transition-duration: 0.5s !important;
   }
 }
 

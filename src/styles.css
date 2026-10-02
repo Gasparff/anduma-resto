@@ -445,6 +445,20 @@
   }
 }
 
+/* Las tarjetas de servicios se mueven solo cuando el usuario las toca o pasa el mouse,
+   así que se exceptúan de la regla de movimiento reducido de arriba. */
+@media (prefers-reduced-motion: reduce) {
+  .flip-scene {
+    animation-duration: 0.8s !important;
+    transition-duration: 0.75s !important;
+  }
+
+  .flip-front,
+  .flip-back {
+    transition-duration: 0.75s, 0.5s !important;
+  }
+}
+
 /* Foto del login: desenfoque leve y opacidad baja a la izquierda, que sube hacia la derecha */
 .foto-login {
   object-position: center 55%;

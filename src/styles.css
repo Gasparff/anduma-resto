@@ -434,6 +434,6 @@
 .foto-login {
   object-position: center 55%;
   filter: blur(2px);
-  -webkit-mask-image: linear-gradient(to right, rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.9));
-  mask-image: linear-gradient(to right, rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.9));
+  -webkit-mask-image: linear-gradient(to right, rgb(0 0 0 / 0), rgb(0 0 0 / 0.9));
+  mask-image: linear-gradient(to right, rgb(0 0 0 / 0), rgb(0 0 0 / 0.9));
 }

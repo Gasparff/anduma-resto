@@ -248,6 +248,22 @@
     0 18px 30px -8px rgb(0 0 0 / 0.5);
 }
 
+/* Motion blur: mientras la tarjeta gira se desenfoca, con el pico a mitad del giro (cuando va de canto) */
+@keyframes flip-blur {
+  0%,
+  100% {
+    filter: blur(0);
+  }
+  50% {
+    filter: blur(5px);
+  }
+}
+
+.flip-scene.is-girando .flip-front,
+.flip-scene.is-girando .flip-back {
+  animation: flip-blur 0.5s cubic-bezier(0.45, 0, 0.55, 1);
+}
+
 /* Textura de cuero/tierra, inspirada en el fondo del logo */
 .textura-cuero {
   background-color: #6b3a24;
@@ -442,6 +458,11 @@
   .flip-front,
   .flip-back {
     transition-duration: 0.5s !important;
+  }
+
+  .flip-scene.is-girando .flip-front,
+  .flip-scene.is-girando .flip-back {
+    animation-duration: 0.5s !important;
   }
 }
 

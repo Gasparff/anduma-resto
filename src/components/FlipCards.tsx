@@ -1,5 +1,5 @@
 import { Check } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IconoServicio } from "@/components/IconoServicio";
 import { SERVICIOS, textoPrecio, type ServicioId } from "@/lib/eventos";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,18 @@ export function FlipCards({ onElegir }: { onElegir?: (id: ServicioId) => void })
   const [abierta, setAbierta] = useState<ServicioId | null>(null);
   // Tarjeta fijada con un clic: se queda abierta aunque el mouse salga.
   const fijada = useRef<ServicioId | null>(null);
+  // Tarjetas que están girando ahora mismo (la que se abre y la que se cierra): llevan el motion blur.
+  const [girando, setGirando] = useState<ServicioId[]>([]);
+  const anterior = useRef<ServicioId | null>(null);
+
+  useEffect(() => {
+    const cambiaron = [anterior.current, abierta].filter((id): id is ServicioId => id !== null);
+    anterior.current = abierta;
+    if (cambiaron.length === 0) return;
+    setGirando(cambiaron);
+    const t = setTimeout(() => setGirando([]), 520);
+    return () => clearTimeout(t);
+  }, [abierta]);
 
   function alternar(id: ServicioId) {
     fijada.current = fijada.current === id ? null : id;
@@ -36,6 +48,7 @@ export function FlipCards({ onElegir }: { onElegir?: (id: ServicioId) => void })
             className={cn(
               "flip-scene h-[13.5rem] cursor-pointer sm:h-[15rem] rounded-3xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring",
               abierta === s.id && "is-flipped",
+              girando.includes(s.id) && "is-girando",
             )}
             onPointerEnter={(e) => {
               if (e.pointerType !== "mouse") return;

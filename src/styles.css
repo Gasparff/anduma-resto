@@ -457,3 +457,14 @@
     opacity: 0;
   }
 }
+
+/* El loader es la señal de que la página está cargando: sigue animado aunque el sistema
+   pida reducir movimiento (si no, queda quieto y parece trabado). Es solo escala y opacidad. */
+@media (prefers-reduced-motion: reduce) {
+  .cargador .circle,
+  .cargador .circle .dot,
+  .cargador .circle .outline {
+    animation-duration: 2s !important;
+    animation-iteration-count: infinite !important;
+  }
+}

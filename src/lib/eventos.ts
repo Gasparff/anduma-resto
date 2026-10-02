@@ -17,6 +17,8 @@ export const NEGOCIO = {
   // Formato internacional para wa.me (54 9 + característica + número).
   whatsapp: "5493573443038",
   whatsappVisible: "3573 44-3038",
+  // TEMPORAL: mail de Gaspar para pruebas. CONFIRMAR el mail del chef.
+  email: "fernandezgaspar13@gmail.com",
   instagram: [
     { usuario: "andumagastronomia", etiqueta: "Restaurante" },
     { usuario: "andumaeventos", etiqueta: "Eventos" },
@@ -311,7 +313,7 @@ function datosIniciales(): Datos {
       {
         id: uid(),
         anfitrion: "Martín",
-        telefono: "3573 55-0123",
+        telefono: "3573 44-3038",
         fecha: dia(8),
         hora: "21:00",
         servicio: "cumpleanos",
@@ -325,7 +327,7 @@ function datosIniciales(): Datos {
       {
         id: uid(),
         anfitrion: "Constructora del Sur",
-        telefono: "3573 55-0456",
+        telefono: "3573 44-3038",
         fecha: dia(6),
         hora: "12:00",
         servicio: "viandas",

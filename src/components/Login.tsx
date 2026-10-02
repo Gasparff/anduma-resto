@@ -178,7 +178,7 @@ export function Login({ onChef, onAnfitrion }: Props) {
                 value={telefono}
                 onChange={setTelefono}
                 type="tel"
-                placeholder="Ej: 3573 55-0123"
+                placeholder="Ej: 3573 44-3038"
               />
               {error && <MensajeError texto={error} />}
               <button type="submit" className={BOTON_PRIMARIO}>

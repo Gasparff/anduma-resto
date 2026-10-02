@@ -183,56 +183,13 @@
   }
 }
 
-/* Flip cards 3D */
+/* Tarjetas de servicios: la tapa se abre como un flip phone, con la bisagra arriba */
 @utility flip-scene {
-  perspective: 1400px;
+  perspective: 900px;
 }
 
-@utility flip-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  transition: transform 0.8s cubic-bezier(0.34, 1.3, 0.64, 1);
-}
-
-@utility flip-face {
-  position: absolute;
-  inset: 0;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  border-radius: var(--radius-2xl);
-  overflow: hidden;
-}
-
-@utility flip-back {
-  transform: rotateY(180deg);
-}
-
-/* Botones: se elevan al pasar el mouse y se hunden al apretar */
-.boton-anim {
-  transition:
-    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.25s ease,
-    filter 0.2s ease,
-    background-color 0.2s ease;
-}
-
-.boton-anim:not(:disabled):hover {
-  transform: translateY(-2px);
-  filter: brightness(1.07);
-  box-shadow: 0 8px 18px -8px color-mix(in oklab, var(--accent) 70%, transparent);
-}
-
-.boton-anim:not(:disabled):active {
-  transform: translateY(0) scale(0.96);
-  filter: brightness(0.97);
-  box-shadow: none;
-  transition-duration: 0.08s;
-}
-
-/* Entrada: cada tarjeta se "da vuelta" al aparecer, una tras otra */
 .flip-scene {
+  position: relative;
   animation: flip-entrada 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   animation-delay: calc(var(--i, 0) * 110ms);
 }
@@ -240,7 +197,7 @@
 @keyframes flip-entrada {
   from {
     opacity: 0;
-    transform: rotateY(-80deg) translateY(12px);
+    transform: rotateX(-70deg) translateY(12px);
   }
   to {
     opacity: 1;
@@ -248,12 +205,51 @@
   }
 }
 
-/* Glow chico, en el color de acento; se intensifica al pasar o dar vuelta */
+.flip-interior,
+.flip-tapa {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+}
+
+/* La tapa: cara visible cuando la tarjeta está cerrada */
+.flip-tapa {
+  z-index: 2;
+  transform-origin: top center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition:
+    transform 0.9s cubic-bezier(0.34, 1.35, 0.5, 1),
+    box-shadow 0.4s ease;
+}
+
+/* Línea de bisagra */
+.flip-tapa::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(to bottom, rgb(0 0 0 / 0.35), transparent);
+}
+
+.flip-scene:hover .flip-tapa,
+.flip-scene:focus-within .flip-tapa,
+.flip-scene.is-flipped .flip-tapa {
+  transform: rotateX(-125deg);
+  pointer-events: none;
+}
+
+.flip-interior {
+  z-index: 1;
+  transition: box-shadow 0.4s ease;
+}
+
+/* Glow chico, en el color de acento; se intensifica al pasar o abrir */
 .flip-glow {
   box-shadow:
     var(--shadow-soft),
     0 0 14px -2px color-mix(in oklab, var(--accent) 45%, transparent);
-  transition: box-shadow 0.4s ease;
 }
 
 .flip-scene:hover .flip-glow,
@@ -262,29 +258,6 @@
   box-shadow:
     var(--shadow-lift),
     0 0 22px 0 color-mix(in oklab, var(--accent) 65%, transparent);
-}
-
-.flip-scene:hover .flip-inner,
-.flip-scene:focus-within .flip-inner,
-.flip-scene.is-flipped .flip-inner {
-  transform: rotateY(180deg);
-}
-
-/* La cara oculta no debe interceptar clics */
-.flip-scene:hover .flip-face:not(.flip-back),
-.flip-scene:focus-within .flip-face:not(.flip-back),
-.flip-scene.is-flipped .flip-face:not(.flip-back) {
-  pointer-events: none;
-}
-
-.flip-scene .flip-back {
-  pointer-events: none;
-}
-
-.flip-scene:hover .flip-back,
-.flip-scene:focus-within .flip-back,
-.flip-scene.is-flipped .flip-back {
-  pointer-events: auto;
 }
 
 /* Textura de cuero/tierra, inspirada en el fondo del logo */

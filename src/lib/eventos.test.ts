@@ -13,13 +13,13 @@ import {
 
 describe("telefonoWhatsapp", () => {
   it("agrega 549 a un número de 10 dígitos", () => {
-    expect(telefonoWhatsapp("3573 46-8600")).toBe("5493573468600");
+    expect(telefonoWhatsapp("3573 44-3038")).toBe("5493573443038");
   });
   it("saca el 0 inicial y el 15", () => {
-    expect(telefonoWhatsapp("03573 15 46-8600")).toBe("5493573468600");
+    expect(telefonoWhatsapp("03573 15 44-3038")).toBe("5493573443038");
   });
   it("respeta un número que ya empieza con 54", () => {
-    expect(telefonoWhatsapp("+54 9 3573 46-8600")).toBe("5493573468600");
+    expect(telefonoWhatsapp("+54 9 3573 44-3038")).toBe("5493573443038");
   });
 });
 

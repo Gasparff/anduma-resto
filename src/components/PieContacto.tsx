@@ -38,7 +38,7 @@ export function PieContacto() {
           <ul className="mt-2 space-y-2">
             <li>
               <a
-                href={urlWhatsapp("Hola Anduma, quiero consultar por un evento.")}
+                href={urlWhatsapp(`Hola ${NEGOCIO.nombre}, quiero consultar por un evento.`)}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"

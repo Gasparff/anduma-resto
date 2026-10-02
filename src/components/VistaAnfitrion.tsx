@@ -117,7 +117,7 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
 
     const lugar = info.usaSalon ? ` en el ${SALONES[salon].nombre}` : "";
     setEnviada(
-      `Hola Anduma, soy ${nombre}. Acabo de enviar un pedido de ${info.singular.toLowerCase()} para el ${formatearFecha(
+      `Hola ${NEGOCIO.nombre}, soy ${nombre}. Acabo de enviar un pedido de ${info.singular.toLowerCase()} para el ${formatearFecha(
         dia,
       )} a las ${hora}${lugar}, para ${cantidad} ${info.unidad}.`,
     );

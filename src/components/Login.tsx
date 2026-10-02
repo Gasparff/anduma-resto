@@ -43,8 +43,8 @@ export function Login({ onChef, onAnfitrion }: Props) {
               Cocina a pedido para tus eventos
             </h1>
             <p className="mt-5 max-w-[46ch] text-base leading-relaxed text-[#f8eedb]/90 sm:text-lg">
-              Bautismos, cumpleaños, casamientos y viandas en Villa del Rosario. Mirá qué fechas
-              están libres y pedí la tuya.
+              Bautismos, cumpleaños, casamientos y viandas en Ciudad Demo. Mirá qué fechas están
+              libres y pedí la tuya.
             </p>
           </div>
 
@@ -55,7 +55,7 @@ export function Login({ onChef, onAnfitrion }: Props) {
             </li>
             <li>
               <a
-                href={urlWhatsapp("Hola Anduma, quiero consultar por un evento.")}
+                href={urlWhatsapp(`Hola ${NEGOCIO.nombre}, quiero consultar por un evento.`)}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f8eedb]"

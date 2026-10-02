@@ -7,20 +7,20 @@ import { VistaChef } from "@/components/VistaChef";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Anduma Resto — Eventos y viandas en Villa del Rosario" },
+      { title: "Resto Demo — Eventos y viandas en Ciudad Demo" },
       {
         name: "description",
         content:
-          "Cocina a pedido para bautismos, cumpleaños, casamientos y viandas en Villa del Rosario, Córdoba. Mirá las fechas libres y pedí la tuya.",
+          "Cocina a pedido para bautismos, cumpleaños, casamientos y viandas en Ciudad Demo, Córdoba. Mirá las fechas libres y pedí la tuya.",
       },
-      { property: "og:title", content: "Anduma Resto — Cocina a pedido para tus eventos" },
+      { property: "og:title", content: "Resto Demo — Cocina a pedido para tus eventos" },
       {
         property: "og:description",
         content:
           "Calendario de fechas libres y pedidos de reserva para bautismos, cumpleaños, casamientos y viandas.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "/logo.png" },
+      { property: "og:image", content: "/logo.svg" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),

@@ -1,6 +1,6 @@
-# Anduma Resto
+# Resto Demo
 
-App de reservas de eventos para Anduma Resto (Villa del Rosario, Córdoba): bautismos, cumpleaños, casamientos y viandas. Dos vistas: **anfitrión** (pide una fecha) y **chef** (acepta o rechaza, con calendario por salón).
+App de reservas de eventos para un restaurante (datos de demostración ficticios): bautismos, cumpleaños, casamientos y viandas. Dos vistas: **anfitrión** (pide una fecha) y **chef** (acepta o rechaza, con calendario por salón).
 
 > Estado: **demo sin backend**. Los datos viven en el `localStorage` del navegador. Ver `CONTEXTO.md` para el contexto del proyecto y los próximos pasos (base de datos, login real, avisos, pagos).
 

@@ -80,17 +80,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Anduma Resto — Eventos y viandas en Villa del Rosario" },
+      { title: "Resto Demo — Eventos y viandas en Ciudad Demo" },
       {
         name: "description",
         content:
-          "Cocina a pedido para bautismos, cumpleaños, casamientos y viandas en Villa del Rosario, Córdoba. Consultá fechas y reservá.",
+          "Cocina a pedido para bautismos, cumpleaños, casamientos y viandas en Ciudad Demo, Córdoba. Consultá fechas y reservá.",
       },
       { name: "theme-color", content: "#1d130f" },
-      { property: "og:title", content: "Anduma Resto — Eventos y viandas" },
+      { property: "og:title", content: "Resto Demo — Eventos y viandas" },
       {
         property: "og:description",
-        content: "Cocina a pedido para tus eventos en Villa del Rosario, Córdoba.",
+        content: "Cocina a pedido para tus eventos en Ciudad Demo, Córdoba.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -106,8 +106,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap",
       },
-      { rel: "icon", href: "/logo.png", type: "image/png" },
-      { rel: "apple-touch-icon", href: "/logo.png" },
+      { rel: "icon", href: "/logo.svg", type: "image/svg+xml" },
+      { rel: "apple-touch-icon", href: "/logo.svg" },
     ],
   }),
   shellComponent: RootShell,

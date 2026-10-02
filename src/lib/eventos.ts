@@ -11,19 +11,18 @@ import { useCallback, useEffect, useState } from "react";
 /* ------------------------------------------------------------------ */
 
 export const NEGOCIO = {
-  nombre: "Anduma Resto",
-  direccion: "Salta 877, Villa del Rosario, Córdoba",
-  // TEMPORAL: número de Gaspar para probar la demo. Antes de mostrarla, volver al del chef (5493573468600 / 3573 46-8600).
+  nombre: "Resto Demo",
+  direccion: "Calle Falsa 123, Ciudad Demo, Córdoba",
+  // DATOS DE PRUEBA (ficticios, salvo teléfono y mail, que son de Gaspar). Reemplazar por los reales del cliente.
   // Formato internacional para wa.me (54 9 + característica + número).
   whatsapp: "5493573443038",
   whatsappVisible: "3573 44-3038",
-  // TEMPORAL: mail de Gaspar para pruebas. CONFIRMAR el mail del chef.
   email: "fernandezgaspar13@gmail.com",
   instagram: [
-    { usuario: "andumagastronomia", etiqueta: "Restaurante" },
-    { usuario: "andumaeventos", etiqueta: "Eventos" },
+    { usuario: "restodemo", etiqueta: "Restaurante" },
+    { usuario: "restodemo.eventos", etiqueta: "Eventos" },
   ],
-  // Según la biografía de Instagram. CONFIRMAR horarios exactos.
+  // Horarios ficticios de demostración.
   horarios: ["Viandas todos los días", "Almuerzos todos los días", "Cenas de miércoles a sábado"],
 } as const;
 
@@ -42,7 +41,7 @@ export function telefonoWhatsapp(valor: string) {
   let d = soloDigitos(valor).replace(/^0+/, "");
   if (d.startsWith("54")) return d;
   if (d.startsWith("15")) d = d.slice(2);
-  // Formato "característica + 15 + número" (ej. 03573 15 46-8600): saca el 15 del medio.
+  // Formato "característica + 15 + número" (ej. 03573 15 44-3038): saca el 15 del medio.
   if (d.length === 12) {
     for (const k of [2, 3, 4]) {
       if (d.slice(k, k + 2) === "15") {
@@ -227,8 +226,8 @@ export type Solicitud = {
 
 export type Datos = { eventos: Evento[]; solicitudes: Solicitud[] };
 
-const STORAGE_KEY = "anduma-eventos-v1";
-const SYNC_EVENT = "anduma-eventos-sync";
+const STORAGE_KEY = "demo-eventos-v2";
+const SYNC_EVENT = "demo-eventos-sync";
 
 export function aISO(d: Date) {
   const y = d.getFullYear();

@@ -85,3 +85,7 @@ Después, en el panel de Vercel: Settings, Deployment Protection, "Disabled", pa
 ## Ideas de negocio que ya charlamos
 
 Esta app es la idea #1 de la lista: sistema de reservas y recordatorios para negocios chicos, con suscripción mensual (US$10 a 25). Otras ideas descartadas por ahora: webs con mantenimiento mensual para pymes, catálogo con pedidos por WhatsApp, herramienta para freelancers y directorio de oficios locales.
+
+## Nota (2 de octubre de 2026): la rama de trabajo usa datos ficticios
+
+En `claude/gifted-dirac-txlmgb` la app ya no tiene datos reales de Anduma: nombre "Resto Demo", dirección, Instagram, horarios y logo son ficticios. Solo el WhatsApp (3573 44-3038) y el mail (fernandezgaspar13@gmail.com) son de Gaspar, para probar. `master` conserva la versión con los datos reales de Anduma.

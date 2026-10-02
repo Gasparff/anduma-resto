@@ -468,3 +468,11 @@
     animation-iteration-count: infinite !important;
   }
 }
+
+/* Foto del login: desenfoque leve y opacidad baja a la izquierda, que sube hacia la derecha */
+.foto-login {
+  object-position: center 55%;
+  filter: blur(2px);
+  -webkit-mask-image: linear-gradient(to right, rgb(0 0 0 / 0.16), rgb(0 0 0 / 0.9));
+  mask-image: linear-gradient(to right, rgb(0 0 0 / 0.16), rgb(0 0 0 / 0.9));
+}

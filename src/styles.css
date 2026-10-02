@@ -1,0 +1,264 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Sistema de diseño — Anduma Resto
+ * Cacao (fondo), cuero (color de marca, el de la textura del logo),
+ * crema (la "A" del logo) y latón apagado (detalles).
+ * El tema oscuro es el principal: es el mundo visual de la marca.
+ */
+
+:root {
+  --radius: 0.9rem;
+  --background: #f2e8d5;
+  --foreground: #2a1b14;
+  --card: #faf3e4;
+  --card-foreground: #2a1b14;
+  --popover: #faf3e4;
+  --popover-foreground: #2a1b14;
+  --primary: #7a3b21;
+  --primary-foreground: #f8eedb;
+  --secondary: #e8dac0;
+  --secondary-foreground: #4a2a1c;
+  --muted: #ebdfc7;
+  --muted-foreground: #6a5444;
+  --accent: #b8873f;
+  --accent-foreground: #2a1b14;
+  --destructive: #b5412f;
+  --destructive-foreground: #ffffff;
+  --success: #4f7a4a;
+  --success-foreground: #ffffff;
+  --warning: #d9a23c;
+  --warning-foreground: #2a1b14;
+  --gold: #b8873f;
+  --gold-foreground: #2a1b14;
+  --border: #d9c8a8;
+  --input: #d9c8a8;
+  --ring: #7a3b21;
+  --chart-1: #7a3b21;
+  --chart-2: #b8873f;
+  --chart-3: #4f7a4a;
+  --chart-4: #b5412f;
+  --chart-5: #6a5444;
+  --sidebar: #efe3cc;
+  --sidebar-foreground: #2a1b14;
+  --sidebar-primary: #7a3b21;
+  --sidebar-primary-foreground: #f8eedb;
+  --sidebar-accent: #e8dac0;
+  --sidebar-accent-foreground: #2a1b14;
+  --sidebar-border: #d9c8a8;
+  --sidebar-ring: #7a3b21;
+  --body-decoration: radial-gradient(
+    900px 520px at 10% -10%,
+    rgb(184 135 63 / 0.22),
+    transparent 60%
+  );
+}
+
+.dark {
+  --background: #1d130f;
+  --foreground: #f1e6d0;
+  --card: #291a14;
+  --card-foreground: #f1e6d0;
+  --popover: #291a14;
+  --popover-foreground: #f1e6d0;
+  --primary: #a9522b;
+  --primary-foreground: #fbf1dd;
+  --secondary: #3a2720;
+  --secondary-foreground: #f1e6d0;
+  --muted: #34231c;
+  --muted-foreground: #c2b199;
+  --accent: #d1a35f;
+  --accent-foreground: #1d130f;
+  --destructive: #e0705c;
+  --destructive-foreground: #1d130f;
+  --success: #7bb176;
+  --success-foreground: #10200f;
+  --warning: #e0b04f;
+  --warning-foreground: #1d130f;
+  --gold: #d1a35f;
+  --gold-foreground: #1d130f;
+  --border: rgb(241 230 208 / 0.14);
+  --input: rgb(241 230 208 / 0.2);
+  --ring: #c9783f;
+  --chart-1: #a9522b;
+  --chart-2: #d1a35f;
+  --chart-3: #7bb176;
+  --chart-4: #e0705c;
+  --chart-5: #c2b199;
+  --sidebar: #241610;
+  --sidebar-foreground: #f1e6d0;
+  --sidebar-primary: #a9522b;
+  --sidebar-primary-foreground: #fbf1dd;
+  --sidebar-accent: #3a2720;
+  --sidebar-accent-foreground: #f1e6d0;
+  --sidebar-border: rgb(241 230 208 / 0.14);
+  --sidebar-ring: #c9783f;
+  --body-decoration: radial-gradient(
+    900px 520px at 10% -10%,
+    rgb(169 82 43 / 0.28),
+    transparent 62%
+  );
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --font-display: "Young Serif", Georgia, serif;
+  --font-sans: "Figtree", system-ui, sans-serif;
+  --shadow-soft: 0 10px 30px -14px oklch(0.2 0.04 40 / 0.35);
+  --shadow-lift: 0 24px 50px -22px oklch(0.2 0.04 40 / 0.5);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    background-image: var(--body-decoration);
+    background-attachment: fixed;
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* Flip cards 3D */
+@utility flip-scene {
+  perspective: 1400px;
+}
+
+@utility flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@utility flip-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+}
+
+@utility flip-back {
+  transform: rotateY(180deg);
+}
+
+.flip-scene:hover .flip-inner,
+.flip-scene:focus-within .flip-inner,
+.flip-scene.is-flipped .flip-inner {
+  transform: rotateY(180deg);
+}
+
+/* La cara oculta no debe interceptar clics */
+.flip-scene:hover .flip-face:not(.flip-back),
+.flip-scene:focus-within .flip-face:not(.flip-back),
+.flip-scene.is-flipped .flip-face:not(.flip-back) {
+  pointer-events: none;
+}
+
+.flip-scene .flip-back {
+  pointer-events: none;
+}
+
+.flip-scene:hover .flip-back,
+.flip-scene:focus-within .flip-back,
+.flip-scene.is-flipped .flip-back {
+  pointer-events: auto;
+}
+
+/* Textura de cuero/tierra, inspirada en el fondo del logo */
+.textura-cuero {
+  background-color: #6b3a24;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.05  0 0 0 0 0.02  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+    radial-gradient(120% 120% at 20% 0%, #8a4a2d, #5a2f1d 70%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes entrada {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-fade-in {
+  animation: entrada 450ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}

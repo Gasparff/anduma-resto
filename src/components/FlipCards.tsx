@@ -65,7 +65,7 @@ export function FlipCards({ onElegir }: { onElegir?: (id: ServicioId) => void })
                       e.stopPropagation();
                       onElegir(s.id);
                     }}
-                    className="rounded-full bg-[#f8eedb] px-4 py-2 text-sm font-medium text-[#2a1b14] transition-transform hover:scale-[1.02] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f8eedb]"
+                    className="boton-anim rounded-full bg-[#f8eedb] px-4 py-2 text-sm font-medium text-[#2a1b14] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f8eedb]"
                   >
                     Pedir {s.nombre.toLowerCase()}
                   </button>

@@ -207,6 +207,28 @@
   transform: rotateY(180deg);
 }
 
+/* Botones: se elevan al pasar el mouse y se hunden al apretar */
+.boton-anim {
+  transition:
+    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.25s ease,
+    filter 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.boton-anim:not(:disabled):hover {
+  transform: translateY(-2px);
+  filter: brightness(1.07);
+  box-shadow: 0 8px 18px -8px color-mix(in oklab, var(--accent) 70%, transparent);
+}
+
+.boton-anim:not(:disabled):active {
+  transform: translateY(0) scale(0.96);
+  filter: brightness(0.97);
+  box-shadow: none;
+  transition-duration: 0.08s;
+}
+
 /* Entrada: cada tarjeta se "da vuelta" al aparecer, una tras otra */
 .flip-scene {
   animation: flip-entrada 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;

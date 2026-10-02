@@ -156,7 +156,7 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
                       <button
                         type="button"
                         onClick={() => eliminarEvento(ev.id)}
-                        className="rounded-full px-2 py-1 text-sm text-destructive hover:bg-destructive/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                        className="boton-anim rounded-full px-2 py-1 text-sm text-destructive hover:bg-destructive/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                         aria-label={`Eliminar ${ev.nombre}`}
                       >
                         Eliminar
@@ -230,7 +230,7 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
                   )}
                   <button
                     type="submit"
-                    className="w-full rounded-2xl bg-primary px-4 py-2.5 font-medium text-primary-foreground transition-transform hover:scale-[1.01] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    className="boton-anim w-full rounded-2xl bg-primary px-4 py-2.5 font-medium text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                   >
                     Guardar evento
                   </button>
@@ -306,14 +306,14 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
                         <button
                           type="button"
                           onClick={() => responder(s, "confirmada")}
-                          className="rounded-full bg-success px-4 py-2 text-sm font-medium text-success-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                          className="boton-anim rounded-full bg-success px-4 py-2 text-sm font-medium text-success-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                         >
                           Aceptar
                         </button>
                         <button
                           type="button"
                           onClick={() => responder(s, "rechazada")}
-                          className="rounded-full border border-destructive/50 px-4 py-2 text-sm font-medium text-destructive focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                          className="boton-anim rounded-full border border-destructive/50 px-4 py-2 text-sm font-medium text-destructive focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                         >
                           Rechazar
                         </button>
@@ -345,7 +345,7 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
               setConfirmaReinicio(false);
             }}
             className={cn(
-              "mt-3 rounded-full border px-4 py-2 font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+              "boton-anim mt-3 rounded-full border px-4 py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
               confirmaReinicio
                 ? "border-destructive bg-destructive/10 text-destructive"
                 : "hover:bg-secondary",

@@ -55,7 +55,7 @@ export function Calendario({
           type="button"
           onClick={() => onCambiarMes(-1)}
           aria-label="Mes anterior"
-          className="rounded-full border px-3 py-1.5 text-sm transition-colors hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          className="boton-anim rounded-full border px-3 py-1.5 text-sm hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           ←
         </button>
@@ -66,7 +66,7 @@ export function Calendario({
           type="button"
           onClick={() => onCambiarMes(1)}
           aria-label="Mes siguiente"
-          className="rounded-full border px-3 py-1.5 text-sm transition-colors hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          className="boton-anim rounded-full border px-3 py-1.5 text-sm hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           →
         </button>

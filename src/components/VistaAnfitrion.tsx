@@ -337,7 +337,7 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
 
               <button
                 type="submit"
-                className="w-full rounded-2xl bg-primary px-4 py-3 font-medium text-primary-foreground transition-transform hover:scale-[1.01] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                className="boton-anim w-full rounded-2xl bg-primary px-4 py-3 font-medium text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
                 Enviar pedido
               </button>

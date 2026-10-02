@@ -29,7 +29,7 @@ export function Encabezado({
             type="button"
             variant="outline"
             onClick={onSalir}
-            className="rounded-full border-primary/30 bg-background/80 backdrop-blur"
+            className="boton-anim rounded-full border-primary/30 bg-background/80 backdrop-blur"
           >
             <LogOut aria-hidden="true" />
             Salir

@@ -10,7 +10,7 @@ type Props = {
 };
 
 const BOTON_PRIMARIO =
-  "w-full rounded-2xl bg-primary px-5 py-3.5 font-medium text-primary-foreground transition-transform hover:scale-[1.01] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
+  "boton-anim w-full rounded-2xl bg-primary px-5 py-3.5 font-medium text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
 
 export function Login({ onChef, onAnfitrion }: Props) {
   const [modo, setModo] = useState<"inicio" | "chef" | "anfitrion">("inicio");
@@ -96,7 +96,7 @@ export function Login({ onChef, onAnfitrion }: Props) {
                 <button
                   type="button"
                   onClick={() => elegir("chef")}
-                  className="w-full rounded-2xl border border-primary/40 bg-secondary px-5 py-3.5 font-medium text-secondary-foreground transition-transform hover:scale-[1.01] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                  className="boton-anim w-full rounded-2xl border border-primary/40 bg-secondary px-5 py-3.5 font-medium text-secondary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                 >
                   Soy del restaurante
                 </button>

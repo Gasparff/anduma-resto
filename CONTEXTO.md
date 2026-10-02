@@ -19,7 +19,7 @@ Una app de **reservas de eventos para Anduma Resto**, el restaurante de un chef 
 - **Qué ofrecen:** bautismos, cumpleaños, casamientos y viandas. Antes hacían comida al campo; ahora hacen cocina de eventos a pedido del organizador.
 - **Salones:** salón de eventos (capacidad 160) y salón restó (capacidad **60, a confirmar: puede ser 80**).
 - **Precios:** no los tengo, todo figura como "A consultar".
-- **Contacto:** Salta 877, Villa del Rosario, Córdoba 5963. WhatsApp 3573 46-8600. Instagram: @andumagastronomia (restaurante) y @andumaeventos (eventos).
+- **Contacto:** Salta 877, Villa del Rosario, Córdoba 5963. WhatsApp del chef 3573 46-8600 (en la demo se usa temporalmente el de Gaspar, 3573 44-3038, para probar). Instagram: @andumagastronomia (restaurante) y @andumaeventos (eventos).
 - **Horarios (de la bio de Instagram, a confirmar):** viandas y almuerzos todos los días, cenas de miércoles a sábado.
 - **Marca:** logo con una "A" en letra cursiva color crema sobre fondo marrón con textura de cuero. Paleta: cacao oscuro, cuero (#7a3b21 / #a9522b), crema (#f1e6d0) y latón apagado (#d1a35f). Tema oscuro por defecto. Tipografías: Young Serif (títulos) y Figtree (texto).
 

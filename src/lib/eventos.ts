@@ -13,9 +13,10 @@ import { useCallback, useEffect, useState } from "react";
 export const NEGOCIO = {
   nombre: "Anduma Resto",
   direccion: "Salta 877, Villa del Rosario, Córdoba",
-  // CONFIRMAR con el chef: formato internacional para wa.me (54 9 + característica + número).
-  whatsapp: "5493573468600",
-  whatsappVisible: "3573 46-8600",
+  // TEMPORAL: número de Gaspar para probar la demo. Antes de mostrarla, volver al del chef (5493573468600 / 3573 46-8600).
+  // Formato internacional para wa.me (54 9 + característica + número).
+  whatsapp: "5493573443038",
+  whatsappVisible: "3573 44-3038",
   instagram: [
     { usuario: "andumagastronomia", etiqueta: "Restaurante" },
     { usuario: "andumaeventos", etiqueta: "Eventos" },

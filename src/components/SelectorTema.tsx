@@ -23,7 +23,7 @@ export function SelectorTema() {
       onClick={cambiarTema}
       aria-label="Cambiar modo de color"
       title="Cambiar modo de color"
-      className="boton-anim h-11 w-20 shrink-0 rounded-full bg-background/80 shadow-sm backdrop-blur"
+      className="boton-anim h-9 w-14 sm:h-11 sm:w-20 shrink-0 rounded-full bg-background/80 shadow-sm backdrop-blur"
     >
       <Moon aria-hidden="true" className="size-5 dark:hidden" />
       <Sun aria-hidden="true" className="hidden size-5 dark:block" />

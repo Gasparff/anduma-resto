@@ -14,16 +14,16 @@ export function Encabezado({
   onSalir: () => void;
 }) {
   return (
-    <header className="sticky top-0 z-20 border-b bg-background/85 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-        <div className="flex items-center gap-3">
+    <header className="z-20 border-b bg-background/85 backdrop-blur sm:sticky sm:top-0">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:gap-3">
+        <div className="flex min-w-0 items-center gap-3">
           <Marca tamano={48} />
-          <div>
+          <div className="min-w-0">
             <p className="text-sm text-muted-foreground">{NEGOCIO.nombre}</p>
             <h1 className="font-display text-xl leading-tight sm:text-2xl">{titulo}</h1>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <SelectorTema />
           <Button
             type="button"

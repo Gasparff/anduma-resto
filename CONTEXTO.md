@@ -19,9 +19,9 @@ Una app de **reservas de eventos para Anduma Resto**, el restaurante de un chef 
 - **Qué ofrecen:** bautismos, cumpleaños, casamientos y viandas. Antes hacían comida al campo; ahora hacen cocina de eventos a pedido del organizador.
 - **Salones:** salón de eventos (capacidad 160) y salón restó (capacidad **60, a confirmar: puede ser 80**).
 - **Precios:** no los tengo, todo figura como "A consultar".
-- **Contacto:** Salta 877, Villa del Rosario, Córdoba 5963. WhatsApp 3573 46-8600. Instagram: @andumagastronomia (restaurante) y @andumaeventos (eventos).
+- **Contacto:** Salta 877, Villa del Rosario, Córdoba 5963. WhatsApp del chef 3573 46-8600  y mail por confirmar (en la demo se usan temporalmente los de Gaspar, 3573 44-3038 y fernandezgaspar13@gmail.com, para probar). Instagram: @andumagastronomia (restaurante) y @andumaeventos (eventos).
 - **Horarios (de la bio de Instagram, a confirmar):** viandas y almuerzos todos los días, cenas de miércoles a sábado.
-- **Marca:** logo con una "A" en letra cursiva color crema sobre fondo marrón con textura de cuero. Paleta: cacao oscuro, cuero (#7a3b21 / #a9522b), crema (#f1e6d0) y latón apagado (#d1a35f). Tema oscuro por defecto. Tipografías: Young Serif (títulos) y Figtree (texto).
+- **Marca:** logo con una "A" en letra cursiva color crema sobre fondo marrón con textura de cuero. Paleta: cacao oscuro, cuero (#7a3b21 / #a9522b), crema (#f1e6d0) y latón apagado (#d1a35f). Tema oscuro por defecto. Tipografías: Cormorant Garamond (títulos) y Jost (texto).
 
 ## Cómo funciona la app
 
@@ -34,7 +34,7 @@ Reglas de negocio: cada salón admite un evento por día; las viandas no ocupan 
 
 ## Stack técnico
 
-- Proyecto creado con **Lovable** (React + TanStack Start + Vite + Tailwind + shadcn/ui). Repo en GitHub: `Gasparff/picture-match-up` (privado).
+- Proyecto creado con **Lovable** (React + TanStack Start + Vite + Tailwind + shadcn/ui). Repo en GitHub: `Gasparff/anduma-resto` (privado). `master` es el respaldo de la demo v1.
 - Carpeta de trabajo en mi PC: `C:\Users\Administrator\Desktop\AndumaResto`. Puerto de desarrollo: 8080 (`npm run dev -- --host`).
 - Archivos clave en `src/`:
   - `lib/eventos.ts`: datos del negocio, servicios, salones, lógica de reservas y datos de ejemplo. **Acá se cambian precios, capacidades y contacto.**
@@ -85,3 +85,7 @@ Después, en el panel de Vercel: Settings, Deployment Protection, "Disabled", pa
 ## Ideas de negocio que ya charlamos
 
 Esta app es la idea #1 de la lista: sistema de reservas y recordatorios para negocios chicos, con suscripción mensual (US$10 a 25). Otras ideas descartadas por ahora: webs con mantenimiento mensual para pymes, catálogo con pedidos por WhatsApp, herramienta para freelancers y directorio de oficios locales.
+
+## Nota (2 de octubre de 2026): la rama de trabajo usa datos ficticios
+
+En `claude/gifted-dirac-txlmgb` la app ya no tiene datos reales de Anduma: nombre "Resto Demo", dirección, Instagram, horarios y logo son ficticios. Solo el WhatsApp (3573 44-3038) y el mail (fernandezgaspar13@gmail.com) son de Gaspar, para probar. `master` conserva la versión con los datos reales de Anduma.

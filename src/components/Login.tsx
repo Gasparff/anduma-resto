@@ -10,7 +10,7 @@ type Props = {
 };
 
 const BOTON_PRIMARIO =
-  "w-full rounded-2xl bg-primary px-5 py-3.5 font-medium text-primary-foreground transition-transform hover:scale-[1.01] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
+  "boton-anim w-full rounded-2xl bg-primary px-5 py-3.5 font-medium text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
 
 export function Login({ onChef, onAnfitrion }: Props) {
   const [modo, setModo] = useState<"inicio" | "chef" | "anfitrion">("inicio");
@@ -32,7 +32,14 @@ export function Login({ onChef, onAnfitrion }: Props) {
       </div>
 
       <div className="grid flex-1 animate-fade-in gap-5 lg:grid-cols-[1.25fr_1fr]">
-        <section className="textura-cuero flex flex-col justify-between gap-12 rounded-3xl p-6 text-[#f8eedb] shadow-[var(--shadow-lift)] sm:p-10">
+        <section className="textura-cuero relative isolate flex flex-col justify-between gap-12 overflow-hidden [text-shadow:0_1px_10px_rgb(0_0_0/0.5)] rounded-3xl p-6 text-[#f8eedb] shadow-[var(--shadow-lift)] sm:p-10">
+          {/* Foto de fondo: leve desenfoque y poca opacidad del lado izquierdo, donde va el texto */}
+          <img
+            src="/login-fondo.jpg"
+            alt=""
+            aria-hidden="true"
+            className="foto-login pointer-events-none absolute inset-0 -z-10 size-full scale-105 object-cover"
+          />
           <div className="flex items-center gap-3">
             <Marca tamano={64} className="ring-2 ring-[#f8eedb]/40" />
             <p className="font-display text-2xl">{NEGOCIO.nombre}</p>
@@ -43,8 +50,8 @@ export function Login({ onChef, onAnfitrion }: Props) {
               Cocina a pedido para tus eventos
             </h1>
             <p className="mt-5 max-w-[46ch] text-base leading-relaxed text-[#f8eedb]/90 sm:text-lg">
-              Bautismos, cumpleaños, casamientos y viandas en Villa del Rosario. Mirá qué fechas
-              están libres y pedí la tuya.
+              Bautismos, cumpleaños, casamientos y viandas en Ciudad Demo. Mirá qué fechas están
+              libres y pedí la tuya.
             </p>
           </div>
 
@@ -55,7 +62,7 @@ export function Login({ onChef, onAnfitrion }: Props) {
             </li>
             <li>
               <a
-                href={urlWhatsapp("Hola Anduma, quiero consultar por un evento.")}
+                href={urlWhatsapp(`Hola ${NEGOCIO.nombre}, quiero consultar por un evento.`)}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f8eedb]"
@@ -96,7 +103,7 @@ export function Login({ onChef, onAnfitrion }: Props) {
                 <button
                   type="button"
                   onClick={() => elegir("chef")}
-                  className="w-full rounded-2xl border border-primary/40 bg-secondary px-5 py-3.5 font-medium text-secondary-foreground transition-transform hover:scale-[1.01] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                  className="boton-anim w-full rounded-2xl border border-primary/40 bg-secondary px-5 py-3.5 font-medium text-secondary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                 >
                   Soy del restaurante
                 </button>
@@ -117,18 +124,18 @@ export function Login({ onChef, onAnfitrion }: Props) {
                   onChef();
                   return;
                 }
-                setError("Usuario o contraseña incorrectos. En la demostración: admin / admin.");
+                setError("Usuario o contraseña incorrectos.");
               }}
             >
               <h2 className="text-2xl">Acceso del restaurante</h2>
               <p className="pb-2 text-sm text-muted-foreground">
-                En la demostración el usuario y la contraseña son <strong>admin</strong>.
+                Ingresá con tu usuario y contraseña.
               </p>
               <Campo
                 label="Usuario"
                 value={usuario}
                 onChange={setUsuario}
-                placeholder="admin"
+                placeholder="Tu usuario"
                 autoFocus
               />
               <Campo
@@ -136,7 +143,7 @@ export function Login({ onChef, onAnfitrion }: Props) {
                 value={clave}
                 onChange={setClave}
                 type="password"
-                placeholder="admin"
+                placeholder="Tu contraseña"
               />
               {error && <MensajeError texto={error} />}
               <button type="submit" className={BOTON_PRIMARIO}>
@@ -178,7 +185,7 @@ export function Login({ onChef, onAnfitrion }: Props) {
                 value={telefono}
                 onChange={setTelefono}
                 type="tel"
-                placeholder="Ej: 3573 55-0123"
+                placeholder="Ej: 3573 44-3038"
               />
               {error && <MensajeError texto={error} />}
               <button type="submit" className={BOTON_PRIMARIO}>
@@ -221,7 +228,7 @@ function Campo({
         autoFocus={autoFocus}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border bg-background px-4 py-3 outline-none placeholder:text-muted-foreground/70 focus-visible:ring-2 focus-visible:ring-ring"
+        className="w-full rounded-xl border bg-background px-4 py-3 shadow-[0_2px_8px_rgb(0_0_0/0.35)] outline-none placeholder:text-muted-foreground/70 focus-visible:ring-2 focus-visible:ring-ring"
       />
     </label>
   );

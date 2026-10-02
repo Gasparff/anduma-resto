@@ -1,26 +1,22 @@
-# AndumaResto
+# Resto Demo
 
-Una plataforma moderna para gestionar reservas de restaurantes y conectar anfitriones con clientes.
+App de reservas de eventos para un restaurante (datos de demostración ficticios): bautismos, cumpleaños, casamientos y viandas. Dos vistas: **anfitrión** (pide una fecha) y **chef** (acepta o rechaza, con calendario por salón).
 
-This project was built with [Lovable](https://lovable.dev).
+> Estado: **demo sin backend**. Los datos viven en el `localStorage` del navegador. Ver `CONTEXTO.md` para el contexto del proyecto y los próximos pasos (base de datos, login real, avisos, pagos).
 
-**Live app**: https://picture-match-up.lovable.app
+Hecho con [Lovable](https://lovable.dev) · React + TanStack Start + Vite + Tailwind + shadcn/ui.
 
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/fa70ac0b-0916-4176-aaf7-67177c05b9be).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+## Desarrollo
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+npm install
+npm run dev      # servidor de desarrollo (puerto 8080)
+npm run build    # build de producción
+npm run lint
+npm test         # tests de la lógica de reservas (vitest)
 ```
+
+Los datos del negocio (precios, capacidades, contacto) se editan en `src/lib/eventos.ts`.
+Demo del chef: usuario `admin`, contraseña `admin`.
+
+> Las librerías de TanStack (`react-start`, `react-router`, `router-plugin`) se actualizan siempre juntas.

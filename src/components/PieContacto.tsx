@@ -1,4 +1,4 @@
-import { Instagram, MapPin, MessageCircle } from "lucide-react";
+import { Instagram, Mail, MapPin, MessageCircle } from "lucide-react";
 import { Marca } from "@/components/Marca";
 import { NEGOCIO, urlWhatsapp } from "@/lib/eventos";
 
@@ -38,13 +38,22 @@ export function PieContacto() {
           <ul className="mt-2 space-y-2">
             <li>
               <a
-                href={urlWhatsapp("Hola Anduma, quiero consultar por un evento.")}
+                href={urlWhatsapp(`Hola ${NEGOCIO.nombre}, quiero consultar por un evento.`)}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
                 <MessageCircle aria-hidden="true" className="size-4" />
                 WhatsApp {NEGOCIO.whatsappVisible}
+              </a>
+            </li>
+            <li>
+              <a
+                href={`mailto:${NEGOCIO.email}`}
+                className="inline-flex items-center gap-2 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              >
+                <Mail aria-hidden="true" className="size-4" />
+                {NEGOCIO.email}
               </a>
             </li>
             {NEGOCIO.instagram.map((ig) => (

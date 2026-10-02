@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Sistema de diseño — Anduma Resto
+ * Sistema de diseño — Resto Demo
  * Cacao (fondo), cuero (color de marca, el de la textura del logo),
  * crema (la "A" del logo) y latón apagado (detalles).
  * El tema oscuro es el principal: es el mundo visual de la marca.
@@ -151,8 +151,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-display: "Young Serif", Georgia, serif;
-  --font-sans: "Figtree", system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Jost", system-ui, sans-serif;
   --shadow-soft: 0 10px 30px -14px oklch(0.2 0.04 40 / 0.35);
   --shadow-lift: 0 24px 50px -22px oklch(0.2 0.04 40 / 0.5);
 }
@@ -166,6 +166,7 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    font-variant-numeric: lining-nums;
     background-image: var(--body-decoration);
     background-attachment: fixed;
     transition: background-color 200ms ease, color 200ms ease;
@@ -176,58 +177,73 @@
   h3,
   .font-display {
     font-family: var(--font-display);
-    font-weight: 400;
-    letter-spacing: -0.01em;
+    font-weight: 600;
+    letter-spacing: 0;
+    font-variant-numeric: lining-nums;
   }
 }
 
-/* Flip cards 3D */
-@utility flip-scene {
-  perspective: 1400px;
-}
-
-@utility flip-inner {
+/* Tarjetas de servicios: flip clásico (la clase is-flipped la maneja FlipCards: solo una abierta a la vez). Al pasar o tocar, el frente gira 180° sobre el eje vertical
+   y la cara de atrás gira a su posición. Cada cara es un elemento aparte con backface oculta. */
+.flip-scene {
   position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+  perspective: 800px;
+  animation: flip-entrada 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 110ms);
 }
 
-@utility flip-face {
+@keyframes flip-entrada {
+  from {
+    opacity: 0;
+    transform: rotateY(-80deg) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.flip-front,
+.flip-back {
   position: absolute;
   inset: 0;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
   border-radius: var(--radius-2xl);
   overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition:
+    transform 0.5s ease,
+    box-shadow 0.4s ease;
 }
 
-@utility flip-back {
+.flip-front {
+  z-index: 3;
+}
+
+.flip-back {
   transform: rotateY(180deg);
 }
 
-.flip-scene:hover .flip-inner,
-.flip-scene:focus-within .flip-inner,
-.flip-scene.is-flipped .flip-inner {
+.flip-scene.is-flipped .flip-front {
+  z-index: 0;
   transform: rotateY(180deg);
 }
 
-/* La cara oculta no debe interceptar clics */
-.flip-scene:hover .flip-face:not(.flip-back),
-.flip-scene:focus-within .flip-face:not(.flip-back),
-.flip-scene.is-flipped .flip-face:not(.flip-back) {
-  pointer-events: none;
-}
-
-.flip-scene .flip-back {
-  pointer-events: none;
-}
-
-.flip-scene:hover .flip-back,
-.flip-scene:focus-within .flip-back,
 .flip-scene.is-flipped .flip-back {
-  pointer-events: auto;
+  transform: rotateY(0);
+}
+
+/* Glow chico, en el color de acento; se intensifica al pasar o dar vuelta */
+.flip-glow {
+  box-shadow:
+    var(--shadow-soft),
+    0 0 14px -2px color-mix(in oklab, var(--accent) 45%, transparent);
+}
+
+.flip-scene.is-flipped .flip-glow {
+  box-shadow:
+    var(--shadow-lift),
+    0 0 22px 0 color-mix(in oklab, var(--accent) 65%, transparent);
 }
 
 /* Textura de cuero/tierra, inspirada en el fondo del logo */
@@ -261,4 +277,163 @@
 
 .animate-fade-in {
   animation: entrada 450ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Pantalla de carga inicial. Loader de Uiverse.io (Li-Deheng), con el color de la marca. */
+.pantalla-carga {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background);
+  transition: opacity 0.4s ease;
+}
+
+.pantalla-carga--sale {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cargador {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  --color: var(--accent);
+  --animation: 2s ease-in-out infinite;
+}
+
+.cargador .circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border: solid 2px var(--color);
+  border-radius: 50%;
+  margin: 0 10px;
+  background-color: transparent;
+  animation: circle-keys var(--animation);
+}
+
+.cargador .circle .dot {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--color);
+  animation: dot-keys var(--animation);
+}
+
+.cargador .circle .outline {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  animation: outline-keys var(--animation);
+}
+
+.cargador .circle:nth-child(2) {
+  animation-delay: 0.3s;
+}
+.cargador .circle:nth-child(3) {
+  animation-delay: 0.6s;
+}
+.cargador .circle:nth-child(4) {
+  animation-delay: 0.9s;
+}
+.cargador .circle:nth-child(5) {
+  animation-delay: 1.2s;
+}
+
+.cargador .circle:nth-child(2) .dot {
+  animation-delay: 0.3s;
+}
+.cargador .circle:nth-child(3) .dot {
+  animation-delay: 0.6s;
+}
+.cargador .circle:nth-child(4) .dot {
+  animation-delay: 0.9s;
+}
+.cargador .circle:nth-child(5) .dot {
+  animation-delay: 1.2s;
+}
+
+.cargador .circle:nth-child(1) .outline {
+  animation-delay: 0.9s;
+}
+.cargador .circle:nth-child(2) .outline {
+  animation-delay: 1.2s;
+}
+.cargador .circle:nth-child(3) .outline {
+  animation-delay: 1.5s;
+}
+.cargador .circle:nth-child(4) .outline {
+  animation-delay: 1.8s;
+}
+.cargador .circle:nth-child(5) .outline {
+  animation-delay: 2.1s;
+}
+
+@keyframes circle-keys {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes dot-keys {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes outline-keys {
+  0% {
+    transform: scale(0);
+    outline: solid 20px var(--color);
+    outline-offset: 0;
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    outline: solid 0 transparent;
+    outline-offset: 20px;
+    opacity: 0;
+  }
+}
+
+/* El loader es la señal de que la página está cargando: sigue animado aunque el sistema
+   pida reducir movimiento (si no, queda quieto y parece trabado). Es solo escala y opacidad. */
+@media (prefers-reduced-motion: reduce) {
+  .cargador .circle,
+  .cargador .circle .dot,
+  .cargador .circle .outline {
+    animation-duration: 2s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
+
+/* Foto del login: desenfoque leve y opacidad baja a la izquierda, que sube hacia la derecha */
+.foto-login {
+  object-position: center 55%;
+  filter: blur(2px);
+  -webkit-mask-image: linear-gradient(to right, rgb(0 0 0 / 0.16), rgb(0 0 0 / 0.9));
+  mask-image: linear-gradient(to right, rgb(0 0 0 / 0.16), rgb(0 0 0 / 0.9));
 }

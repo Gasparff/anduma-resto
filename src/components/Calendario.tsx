@@ -55,7 +55,7 @@ export function Calendario({
           type="button"
           onClick={() => onCambiarMes(-1)}
           aria-label="Mes anterior"
-          className="flex size-9 items-center justify-center rounded-full bg-secondary/60 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          className="boton-anim flex size-9 items-center justify-center rounded-full bg-secondary/60 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           ←
         </button>
@@ -66,7 +66,7 @@ export function Calendario({
           type="button"
           onClick={() => onCambiarMes(1)}
           aria-label="Mes siguiente"
-          className="flex size-9 items-center justify-center rounded-full bg-secondary/60 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          className="boton-anim flex size-9 items-center justify-center rounded-full bg-secondary/60 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           →
         </button>

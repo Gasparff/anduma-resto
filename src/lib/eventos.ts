@@ -11,16 +11,18 @@ import { useCallback, useEffect, useState } from "react";
 /* ------------------------------------------------------------------ */
 
 export const NEGOCIO = {
-  nombre: "Anduma Resto",
-  direccion: "Salta 877, Villa del Rosario, Córdoba",
-  // CONFIRMAR con el chef: formato internacional para wa.me (54 9 + característica + número).
-  whatsapp: "5493573468600",
-  whatsappVisible: "3573 46-8600",
+  nombre: "Resto Demo",
+  direccion: "Calle Falsa 123, Ciudad Demo, Córdoba",
+  // DATOS DE PRUEBA (ficticios, salvo teléfono y mail, que son de Gaspar). Reemplazar por los reales del cliente.
+  // Formato internacional para wa.me (54 9 + característica + número).
+  whatsapp: "5493573443038",
+  whatsappVisible: "3573 44-3038",
+  email: "fernandezgaspar13@gmail.com",
   instagram: [
-    { usuario: "andumagastronomia", etiqueta: "Restaurante" },
-    { usuario: "andumaeventos", etiqueta: "Eventos" },
+    { usuario: "restodemo", etiqueta: "Restaurante" },
+    { usuario: "restodemo.eventos", etiqueta: "Eventos" },
   ],
-  // Según la biografía de Instagram. CONFIRMAR horarios exactos.
+  // Horarios ficticios de demostración.
   horarios: ["Viandas todos los días", "Almuerzos todos los días", "Cenas de miércoles a sábado"],
 } as const;
 
@@ -39,6 +41,15 @@ export function telefonoWhatsapp(valor: string) {
   let d = soloDigitos(valor).replace(/^0+/, "");
   if (d.startsWith("54")) return d;
   if (d.startsWith("15")) d = d.slice(2);
+  // Formato "característica + 15 + número" (ej. 03573 15 44-3038): saca el 15 del medio.
+  if (d.length === 12) {
+    for (const k of [2, 3, 4]) {
+      if (d.slice(k, k + 2) === "15") {
+        d = d.slice(0, k) + d.slice(k + 2);
+        break;
+      }
+    }
+  }
   return d.length === 10 ? `549${d}` : d;
 }
 
@@ -83,7 +94,8 @@ export type Servicio = {
   resumen: string;
   descripcion: string;
   incluye: string[];
-  precio: string;
+  /** Precio por persona (o por vianda) en pesos. Valores ficticios de demostración. */
+  precioUnitario: number;
   /** Los eventos ocupan un salón; las viandas se preparan y se retiran o entregan. */
   usaSalon: boolean;
   unidad: "personas" | "viandas";
@@ -106,7 +118,7 @@ export const SERVICIOS: Servicio[] = [
       "Atención de mesa",
       "Opciones para celíacos y vegetarianos",
     ],
-    precio: "A consultar",
+    precioUnitario: 18000,
     usaSalon: true,
     unidad: "personas",
     horaSugerida: "12:30",
@@ -123,7 +135,7 @@ export const SERVICIOS: Servicio[] = [
       "Atención de mesa",
       "Espacio para torta y música",
     ],
-    precio: "A consultar",
+    precioUnitario: 16000,
     usaSalon: true,
     unidad: "personas",
     horaSugerida: "21:00",
@@ -141,7 +153,7 @@ export const SERVICIOS: Servicio[] = [
       "Personal de cocina y de sala",
       "Reunión previa para definir el menú",
     ],
-    precio: "A consultar",
+    precioUnitario: 32000,
     usaSalon: true,
     unidad: "personas",
     horaSugerida: "21:00",
@@ -159,12 +171,44 @@ export const SERVICIOS: Servicio[] = [
       "Retiro en el local o entrega",
       "Pedidos fijos por semana",
     ],
-    precio: "A consultar",
+    precioUnitario: 6500,
     usaSalon: false,
     unidad: "viandas",
     horaSugerida: "12:00",
   },
 ];
+
+/** Recargo fijo por usar cada salón (ficticio). */
+export const RECARGO_SALON: Record<SalonId, number> = { eventos: 150000, resto: 0 };
+
+export function formatearPesos(valor: number) {
+  return `$${Math.round(valor).toLocaleString("es-AR")}`;
+}
+
+export function textoPrecio(servicio: Servicio) {
+  const por = servicio.unidad === "viandas" ? "vianda" : "persona";
+  return `Desde ${formatearPesos(servicio.precioUnitario)} por ${por}`;
+}
+
+export type Presupuesto = {
+  unitario: number;
+  subtotal: number;
+  recargoSalon: number;
+  total: number;
+};
+
+/** Presupuesto estimado, sin cargar a nadie: la cifra final la confirma el chef. */
+export function calcularPresupuesto(
+  servicio: ServicioId,
+  salon: SalonId | undefined,
+  cantidad: number,
+): Presupuesto | null {
+  if (!Number.isFinite(cantidad) || cantidad < 1) return null;
+  const info = servicioPorId(servicio);
+  const subtotal = info.precioUnitario * cantidad;
+  const recargoSalon = info.usaSalon && salon ? RECARGO_SALON[salon] : 0;
+  return { unitario: info.precioUnitario, subtotal, recargoSalon, total: subtotal + recargoSalon };
+}
 
 export function servicioPorId(id: ServicioId): Servicio {
   return SERVICIOS.find((s) => s.id === id) ?? (SERVICIOS[0] as Servicio);
@@ -209,14 +253,16 @@ export type Solicitud = {
   personas: number;
   comentario: string;
   dietas?: string[];
+  /** Presupuesto estimado en pesos al momento del pedido. */
+  presupuesto?: number | undefined;
   estado: EstadoSolicitud;
   creada: string;
 };
 
 export type Datos = { eventos: Evento[]; solicitudes: Solicitud[] };
 
-const STORAGE_KEY = "anduma-eventos-v1";
-const SYNC_EVENT = "anduma-eventos-sync";
+const STORAGE_KEY = "demo-eventos-v2";
+const SYNC_EVENT = "demo-eventos-sync";
 
 export function aISO(d: Date) {
   const y = d.getFullYear();
@@ -301,7 +347,7 @@ function datosIniciales(): Datos {
       {
         id: uid(),
         anfitrion: "Martín",
-        telefono: "3573 55-0123",
+        telefono: "3573 44-3038",
         fecha: dia(8),
         hora: "21:00",
         servicio: "cumpleanos",
@@ -315,7 +361,7 @@ function datosIniciales(): Datos {
       {
         id: uid(),
         anfitrion: "Constructora del Sur",
-        telefono: "3573 55-0456",
+        telefono: "3573 44-3038",
         fecha: dia(6),
         hora: "12:00",
         servicio: "viandas",

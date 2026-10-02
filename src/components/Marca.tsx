@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 export function Marca({ tamano = 44, className }: { tamano?: number; className?: string }) {
   return (
     <img
-      src="/logo.png"
+      src="/logo.svg"
       alt={`Logo de ${NEGOCIO.nombre}`}
       width={tamano}
       height={tamano}

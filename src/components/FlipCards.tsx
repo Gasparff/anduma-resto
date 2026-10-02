@@ -1,7 +1,7 @@
 import { Check } from "lucide-react";
 import { useState } from "react";
 import { IconoServicio } from "@/components/IconoServicio";
-import { SERVICIOS, type ServicioId } from "@/lib/eventos";
+import { SERVICIOS, textoPrecio, type ServicioId } from "@/lib/eventos";
 import { cn } from "@/lib/utils";
 
 export function FlipCards({ onElegir }: { onElegir?: (id: ServicioId) => void }) {
@@ -56,7 +56,7 @@ export function FlipCards({ onElegir }: { onElegir?: (id: ServicioId) => void })
                     </li>
                   ))}
                 </ul>
-                <p className="mt-auto text-sm font-semibold text-[#f3dba8]">Precio: {s.precio}</p>
+                <p className="mt-auto text-sm font-semibold text-[#f3dba8]">{textoPrecio(s)}</p>
                 {onElegir && (
                   <button
                     type="button"

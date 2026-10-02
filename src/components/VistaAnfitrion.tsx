@@ -10,8 +10,10 @@ import {
   NEGOCIO,
   SALONES,
   SERVICIOS,
+  calcularPresupuesto,
   capacidadMaxima,
   formatearFecha,
+  formatearPesos,
   hoyISO,
   salonOcupado,
   salonSugerido,
@@ -55,6 +57,7 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
 
   const info = servicioPorId(servicio);
   const cantidad = Number(personas);
+  const presupuesto = calcularPresupuesto(servicio, info.usaSalon ? salon : undefined, cantidad);
   const salonDelCalendario = info.usaSalon ? salon : null;
 
   const misSolicitudes = datos.solicitudes.filter(
@@ -113,13 +116,16 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
       personas: cantidad,
       comentario: comentario.trim(),
       dietas,
+      presupuesto: presupuesto?.total,
     });
 
     const lugar = info.usaSalon ? ` en el ${SALONES[salon].nombre}` : "";
     setEnviada(
       `Hola ${NEGOCIO.nombre}, soy ${nombre}. Acabo de enviar un pedido de ${info.singular.toLowerCase()} para el ${formatearFecha(
         dia,
-      )} a las ${hora}${lugar}, para ${cantidad} ${info.unidad}.`,
+      )} a las ${hora}${lugar}, para ${cantidad} ${info.unidad}.${
+        presupuesto ? ` Presupuesto estimado: ${formatearPesos(presupuesto.total)}.` : ""
+      }`,
     );
     setError("");
     setPersonas("");
@@ -291,6 +297,23 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
                   className={CAMPO}
                 />
               </label>
+
+              {presupuesto && (
+                <div className="rounded-xl bg-secondary px-4 py-3" aria-live="polite">
+                  <p className="flex items-baseline justify-between gap-3">
+                    <span className="font-medium">Presupuesto estimado</span>
+                    <span className="font-display text-xl">
+                      {formatearPesos(presupuesto.total)}
+                    </span>
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {cantidad} {info.unidad} × {formatearPesos(presupuesto.unitario)}
+                    {presupuesto.recargoSalon > 0 &&
+                      ` + ${formatearPesos(presupuesto.recargoSalon)} del ${SALONES[salon].nombre}`}
+                    . Es un valor orientativo: el precio final lo confirma el chef.
+                  </p>
+                </div>
+              )}
 
               {error && (
                 <p role="alert" className="text-sm text-destructive">

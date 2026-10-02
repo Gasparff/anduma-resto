@@ -14,6 +14,7 @@ import {
   salonOcupado,
   salonSugerido,
   servicioPorId,
+  formatearPesos,
   telefonoWhatsapp,
   urlWhatsapp,
   useDatos,
@@ -275,6 +276,11 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
                       {servicioDe.nombre} · {s.personas} {servicioDe.unidad}
                       {s.salon ? ` · ${SALONES[s.salon].nombre}` : ""}
                     </p>
+                    {s.presupuesto && (
+                      <p className="mt-1 text-sm">
+                        Presupuesto estimado: {formatearPesos(s.presupuesto)}
+                      </p>
+                    )}
                     {s.dietas && s.dietas.length > 0 && (
                       <p className="mt-1 text-sm">Menú especial: {s.dietas.join(", ")}</p>
                     )}

@@ -94,7 +94,8 @@ export type Servicio = {
   resumen: string;
   descripcion: string;
   incluye: string[];
-  precio: string;
+  /** Precio por persona (o por vianda) en pesos. Valores ficticios de demostración. */
+  precioUnitario: number;
   /** Los eventos ocupan un salón; las viandas se preparan y se retiran o entregan. */
   usaSalon: boolean;
   unidad: "personas" | "viandas";
@@ -117,7 +118,7 @@ export const SERVICIOS: Servicio[] = [
       "Atención de mesa",
       "Opciones para celíacos y vegetarianos",
     ],
-    precio: "A consultar",
+    precioUnitario: 18000,
     usaSalon: true,
     unidad: "personas",
     horaSugerida: "12:30",
@@ -134,7 +135,7 @@ export const SERVICIOS: Servicio[] = [
       "Atención de mesa",
       "Espacio para torta y música",
     ],
-    precio: "A consultar",
+    precioUnitario: 16000,
     usaSalon: true,
     unidad: "personas",
     horaSugerida: "21:00",
@@ -152,7 +153,7 @@ export const SERVICIOS: Servicio[] = [
       "Personal de cocina y de sala",
       "Reunión previa para definir el menú",
     ],
-    precio: "A consultar",
+    precioUnitario: 32000,
     usaSalon: true,
     unidad: "personas",
     horaSugerida: "21:00",
@@ -170,12 +171,44 @@ export const SERVICIOS: Servicio[] = [
       "Retiro en el local o entrega",
       "Pedidos fijos por semana",
     ],
-    precio: "A consultar",
+    precioUnitario: 6500,
     usaSalon: false,
     unidad: "viandas",
     horaSugerida: "12:00",
   },
 ];
+
+/** Recargo fijo por usar cada salón (ficticio). */
+export const RECARGO_SALON: Record<SalonId, number> = { eventos: 150000, resto: 0 };
+
+export function formatearPesos(valor: number) {
+  return `$${Math.round(valor).toLocaleString("es-AR")}`;
+}
+
+export function textoPrecio(servicio: Servicio) {
+  const por = servicio.unidad === "viandas" ? "vianda" : "persona";
+  return `Desde ${formatearPesos(servicio.precioUnitario)} por ${por}`;
+}
+
+export type Presupuesto = {
+  unitario: number;
+  subtotal: number;
+  recargoSalon: number;
+  total: number;
+};
+
+/** Presupuesto estimado, sin cargar a nadie: la cifra final la confirma el chef. */
+export function calcularPresupuesto(
+  servicio: ServicioId,
+  salon: SalonId | undefined,
+  cantidad: number,
+): Presupuesto | null {
+  if (!Number.isFinite(cantidad) || cantidad < 1) return null;
+  const info = servicioPorId(servicio);
+  const subtotal = info.precioUnitario * cantidad;
+  const recargoSalon = info.usaSalon && salon ? RECARGO_SALON[salon] : 0;
+  return { unitario: info.precioUnitario, subtotal, recargoSalon, total: subtotal + recargoSalon };
+}
 
 export function servicioPorId(id: ServicioId): Servicio {
   return SERVICIOS.find((s) => s.id === id) ?? (SERVICIOS[0] as Servicio);
@@ -220,6 +253,8 @@ export type Solicitud = {
   personas: number;
   comentario: string;
   dietas?: string[];
+  /** Presupuesto estimado en pesos al momento del pedido. */
+  presupuesto?: number | undefined;
   estado: EstadoSolicitud;
   creada: string;
 };

@@ -3,6 +3,10 @@ import {
   MAX_VIANDAS,
   SALONES,
   aISO,
+  calcularPresupuesto,
+  formatearPesos,
+  RECARGO_SALON,
+  SERVICIOS,
   capacidadMaxima,
   salonOcupado,
   salonSugerido,
@@ -70,5 +74,25 @@ describe("salonOcupado", () => {
 describe("aISO", () => {
   it("formatea con ceros a la izquierda", () => {
     expect(aISO(new Date(2026, 0, 5))).toBe("2026-01-05");
+  });
+});
+
+describe("calcularPresupuesto", () => {
+  const cumple = SERVICIOS.find((x) => x.id === "cumpleanos")!;
+  it("suma precio por persona y recargo del salón", () => {
+    const p = calcularPresupuesto("cumpleanos", "eventos", 10)!;
+    expect(p.subtotal).toBe(cumple.precioUnitario * 10);
+    expect(p.recargoSalon).toBe(RECARGO_SALON.eventos);
+    expect(p.total).toBe(p.subtotal + p.recargoSalon);
+  });
+  it("las viandas no pagan recargo de salón", () => {
+    expect(calcularPresupuesto("viandas", "eventos", 20)!.recargoSalon).toBe(0);
+  });
+  it("sin cantidad válida no hay presupuesto", () => {
+    expect(calcularPresupuesto("cumpleanos", "resto", 0)).toBeNull();
+    expect(calcularPresupuesto("cumpleanos", "resto", NaN)).toBeNull();
+  });
+  it("formatea pesos con separador de miles", () => {
+    expect(formatearPesos(1234567)).toMatch(/^\$1[.,]234[.,]567$/);
   });
 });

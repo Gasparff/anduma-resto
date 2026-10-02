@@ -197,6 +197,7 @@ export function Login({ onChef, onAnfitrion }: Props) {
                 label="Tu nombre"
                 value={nombre}
                 onChange={setNombre}
+                maxLength={80}
                 placeholder="Ej: Valentina"
                 autoFocus
               />
@@ -229,6 +230,7 @@ function Campo({
   value,
   onChange,
   type = "text",
+  maxLength,
   placeholder,
   autoFocus,
 }: {
@@ -236,6 +238,7 @@ function Campo({
   value: string;
   onChange: (v: string) => void;
   type?: string;
+  maxLength?: number;
   placeholder?: string;
   autoFocus?: boolean;
 }) {
@@ -244,6 +247,7 @@ function Campo({
       <span className="mb-1 block font-medium">{label}</span>
       <input
         type={type}
+        {...(maxLength ? { maxLength } : {})}
         value={value}
         autoFocus={autoFocus}
         placeholder={placeholder}

@@ -31,8 +31,11 @@ La URL y la clave pública ya están en `src/lib/supabase.ts` (se pueden pisar c
 - `supabase/migrations/0001_esquema_inicial.sql`: tablas, reglas de negocio y permisos (RLS).
 - `supabase/migrations/0002_estado_solicitudes.sql`: estado de pedidos para el anfitrión, lectura pública
   limitada por columnas (el mail de avisos no es público) y arreglo del permiso de `es_miembro`.
+- `supabase/migrations/0003_limites_anti_spam.sql`: límites en `crear_solicitud` (3 pedidos por hora y 5 pendientes
+  por teléfono, 40 por hora en todo el negocio, largo máximo de nombre y comentario, fechas razonables).
 - `supabase/seed.sql`: negocio y catálogo iniciales, generado con `npx vite-node scripts/generar-seed.ts`.
-- `supabase/instalar_todo.sql`: las tres cosas anteriores juntas, para pegar de una vez.
+- `supabase/instalar_todo.sql`: todo lo anterior junto, para instalar de cero. Si la base ya estaba instalada,
+  se pegan solo las migraciones nuevas (por ejemplo `0003`).
 - `supabase/tests/`: pruebas reproducibles (`00_mock_supabase.sql`, `01_escenario.sql`, `02_catalogo_y_estado.sql`).
 
 ### Modelo
@@ -72,7 +75,8 @@ La URL y la clave pública ya están en `src/lib/supabase.ts` (se pueden pisar c
 
 ## Pendientes de seguridad
 
-- `crear_solicitud` es pública: poner límite de frecuencia y captcha antes de publicar.
+- `crear_solicitud` es pública: ya tiene límites de frecuencia y de tamaño (migración 0003). Falta un captcha
+  (por ejemplo Cloudflare Turnstile) antes de publicar a gran escala; `anotar_lista_espera` aún no tiene límites.
 - Validar el formato de mail y teléfono también en la app.
 - Guardar las claves secretas (Mercado Pago, mails) solo en secretos de las Edge Functions.
 

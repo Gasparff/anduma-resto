@@ -304,6 +304,7 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
                   onChange={(e) => setComentario(e.target.value)}
                   placeholder="Alergias, tipo de menú que imaginás, lo que quieras contarnos"
                   rows={3}
+                  maxLength={1000}
                   className={CAMPO}
                 />
               </label>

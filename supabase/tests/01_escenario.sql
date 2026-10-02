@@ -22,9 +22,9 @@ select 'T2 anónimo no lee solicitudes (debe fallar)';
 select count(*) from solicitudes;
 select 'T3 viandas sin salón', crear_solicitud('resto-demo','viandas',null,'Cons','35734430','',current_date+1,'12:00',100) is not null;
 select 'T4 sobre capacidad (debe fallar)';
-select crear_solicitud('resto-demo','cumpleanos','resto','X','35734430','',current_date+3,'21:00',61);
+select crear_solicitud('resto-demo','cumpleanos','resto','X','35734431','',current_date+3,'21:00',61);
 select 'T5 día pasado (debe fallar)';
-select crear_solicitud('resto-demo','cumpleanos','eventos','X','35734430','',current_date-1,'21:00',10);
+select crear_solicitud('resto-demo','cumpleanos','eventos','X','35734432','',current_date-1,'21:00',10);
 reset role;
 
 select 'T6 presupuesto esperado 790000', presupuesto from solicitudes where anfitrion = 'Ana';
@@ -47,7 +47,7 @@ select 'T11 estados', string_agg(anfitrion || '=' || estado, ', ' order by anfit
 
 set role anon;
 select 'T12 salón ya ocupado (debe fallar)';
-select crear_solicitud('resto-demo','cumpleanos','eventos','Z','35734430','',current_date+10,'21:00',5);
+select crear_solicitud('resto-demo','cumpleanos','eventos','Z','35734433','',current_date+10,'21:00',5);
 select 'T13 fechas ocupadas (esperado 1)', count(*) from fechas_ocupadas('resto-demo');
 select 'T14 anónimo no lee eventos (debe fallar)';
 select count(*) from eventos;

@@ -46,7 +46,9 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
 
   const info = servicioPorId(servicio);
   const eventosDelDia = dia ? datos.eventos.filter((e) => e.fecha === dia) : [];
-  const pendientes = datos.solicitudes.filter((s) => s.estado === "pendiente");
+  const hoy = hoyISO();
+  // Un pedido pendiente cuya fecha ya pasó no se puede aceptar: se muestra como vencido.
+  const pendientes = datos.solicitudes.filter((s) => s.estado === "pendiente" && s.fecha >= hoy);
 
   function cambiarServicio(id: ServicioId) {
     setServicio(id);
@@ -267,7 +269,7 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
                           {formatearFecha(s.fecha)} · {s.hora}
                         </p>
                       </div>
-                      <EstadoTag estado={s.estado} />
+                      <EstadoTag estado={s.estado} fecha={s.fecha} />
                     </div>
                     <p className="mt-2 text-sm">
                       {servicioDe.nombre} · {s.personas} {servicioDe.unidad}
@@ -298,7 +300,7 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
                         {avisos[s.id]}
                       </p>
                     )}
-                    {s.estado === "pendiente" && (
+                    {s.estado === "pendiente" && s.fecha >= hoy && (
                       <div className="mt-4 flex gap-2">
                         <button
                           type="button"
@@ -360,7 +362,21 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
   );
 }
 
-export function EstadoTag({ estado }: { estado: "pendiente" | "confirmada" | "rechazada" }) {
+export function EstadoTag({
+  estado,
+  fecha,
+}: {
+  estado: "pendiente" | "confirmada" | "rechazada";
+  /** Si se indica y ya pasó, un pedido pendiente se muestra como vencido. */
+  fecha?: string;
+}) {
+  if (estado === "pendiente" && fecha && fecha < hoyISO()) {
+    return (
+      <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+        Vencido
+      </span>
+    );
+  }
   const estilos = {
     pendiente: "bg-warning/25 text-foreground",
     confirmada: "bg-success/20 text-success",

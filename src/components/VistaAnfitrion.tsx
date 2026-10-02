@@ -29,6 +29,7 @@ import {
   salonPorId,
 } from "@/lib/eventos";
 import { avisarAlChef } from "@/lib/notificar";
+import { slugDelNegocio } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
 const DIETAS = [
@@ -114,7 +115,7 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
       return setError("Ese salón ya está ocupado ese día.");
 
     setEnviando(true);
-    const problema = await crearSolicitud({
+    const resultado = await crearSolicitud({
       anfitrion: nombre,
       telefono,
       fecha: dia,
@@ -127,16 +128,26 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
       presupuesto: presupuesto?.total,
     });
     setEnviando(false);
-    if (problema) return setError(problema);
+    if ("error" in resultado) return setError(resultado.error);
 
     const lugar = info.usaSalon ? ` en el ${salonPorId(salon).nombre}` : "";
-    avisarAlChef({
-      titulo: `Pedido nuevo: ${info.singular}`,
-      mensaje: `${nombre} (${telefono}) pidió el ${formatearFecha(dia)} a las ${hora}${lugar}, para ${cantidad} ${info.unidad}.${
-        presupuesto ? ` Presupuesto: ${formatearPesos(presupuesto.total)}.` : ""
-      }`,
-      clic: urlWhatsapp(`Hola ${nombre}, recibí tu pedido.`, telefonoWhatsapp(telefono)),
-    });
+    // Aviso al celular del chef (solo con la base conectada: en demostración no hay pedido real).
+    if (resultado.id) {
+      avisarAlChef({
+        slug: slugDelNegocio(),
+        id: resultado.id,
+        anfitrion: nombre,
+        telefono,
+        servicio: info.singular,
+        fecha: formatearFecha(dia),
+        hora,
+        lugar: info.usaSalon ? salonPorId(salon).nombre : "",
+        cantidad: `${cantidad} ${info.unidad}`,
+        presupuesto: presupuesto ? formatearPesos(presupuesto.total) : "",
+        comentario: comentario.trim(),
+        whatsappCliente: telefonoWhatsapp(telefono),
+      });
+    }
     setEnviada(
       `Hola ${NEGOCIO.nombre}, soy ${nombre}. Acabo de enviar un pedido de ${info.singular.toLowerCase()} para el ${formatearFecha(
         dia,
@@ -384,7 +395,7 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
                           {s.salon ? ` · ${salonPorId(s.salon).nombre}` : ""}
                         </p>
                       </div>
-                      <EstadoTag estado={s.estado} />
+                      <EstadoTag estado={s.estado} fecha={s.fecha} />
                     </div>
                   ))}
               </div>

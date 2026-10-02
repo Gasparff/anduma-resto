@@ -4,7 +4,7 @@ import { PantallaCarga } from "@/components/PantallaCarga";
 import { Login } from "@/components/Login";
 import { VistaAnfitrion } from "@/components/VistaAnfitrion";
 import { VistaChef } from "@/components/VistaChef";
-import { cerrarSesionChef, chefConSesion } from "@/lib/backend";
+import { alCerrarseLaSesion, cerrarSesionChef, chefConSesion } from "@/lib/backend";
 import { cabeceraDe, cargarCabecera } from "@/lib/cabecera";
 import { resolverModo, useModoBackend } from "@/lib/supabase";
 
@@ -58,6 +58,14 @@ function App() {
       vigente = false;
     };
   }, []);
+
+  // Si la sesión del chef se cierra (vence, o sale desde otra pestaña), vuelve a la pantalla de ingreso.
+  useEffect(() => {
+    if (modo !== "remoto") return;
+    return alCerrarseLaSesion(() =>
+      setSesion((actual) => (actual?.rol === "chef" ? null : actual)),
+    );
+  }, [modo]);
 
   function salir() {
     if (sesion?.rol === "chef") void cerrarSesionChef();

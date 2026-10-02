@@ -48,9 +48,33 @@ cruzadas) y en el navegador con dos restaurantes simulados.
 
 - Los fondos neutros (marrón cálido) son los mismos para todos; la marca cambia colores de acción, acento,
   logo, textos y fotos. Teñir también los fondos es posible pero queda para más adelante.
-- Aviso al celular (ntfy), mails y Mercado Pago son **por instalación**, no por restaurante: ntfy solo avisa al
-  negocio principal. Hacerlos por negocio requiere Edge Functions (ver abajo).
+- Mails y Mercado Pago son **por instalación**, no por restaurante. El aviso por ntfy ya puede ser por restaurante
+  (`NTFY_TOPICS`); mails y Mercado Pago requieren cuentas externas y Edge Functions (ver abajo).
 - Sin logo propio se usan iniciales; para subir logos desde el panel habría que sumar Supabase Storage.
+
+## Avisos al celular (ntfy), desde el servidor
+
+El aviso de pedido nuevo lo envía **el servidor** (`src/lib/avisos-servidor.ts`), no el navegador:
+
+- El tema de ntfy es una variable de entorno del **servidor** (`NTFY_TOPIC`, o el viejo `VITE_NTFY_TOPIC`, que sigue
+  funcionando): nunca viaja al navegador, así nadie puede verlo ni mandar avisos falsos.
+- Antes de avisar comprueba en la base que el pedido **exista** y siga pendiente, no repite avisos del mismo pedido y
+  recorta todo lo recibido. Probado atacando el endpoint directamente.
+- La notificación lleva el ícono del negocio (`public/icono-aviso.png`), los datos del pedido y dos botones
+  (**Abrir panel** y **WhatsApp al cliente**).
+- Por restaurante: `NTFY_TOPICS={"la-parrilla":"tema-secreto"}`. Un restaurante sin tema propio **no** avisa
+  (nunca al del principal). Ver `.env.example`.
+
+## Robustez
+
+- **Panel del chef:** carga los pendientes y los últimos 90 días (no todo el historial); un pedido pendiente con fecha
+  pasada se muestra como «Vencido» y no se puede aceptar; si la sesión se cierra (otra pestaña o vencimiento) vuelve
+  solo a la pantalla de ingreso; se actualiza cada 15 segundos y al instante si la base tiene el tiempo real activo.
+- **Monitoreo:** `/api/salud` devuelve 200 si la app y la base responden y 503 si la base no responde. Sirve para
+  UptimeRobot (gratis) o para mirarlo a mano.
+- **Migración opcional `0005_robustez.sql`** (la app funciona igual sin ella y la aprovecha sola al aplicarla): un doble
+  envío no duplica el pedido, la lista de espera tiene validaciones y límites, los pedidos vencidos pasan a «cancelada»,
+  el chef puede borrar entradas de su lista de espera y se activa el tiempo real.
 
 ## Cómo está conectado
 
@@ -71,6 +95,7 @@ cruzadas) y en el navegador con dos restaurantes simulados.
 - `supabase/migrations/0003_limites_anti_spam.sql`: límites en `crear_solicitud` (3 pedidos por hora y 5 pendientes
   por teléfono, 40 por hora en todo el negocio, largo máximo de nombre y comentario, fechas razonables).
 - `supabase/migrations/0004_multinegocio.sql`: aislamiento entre negocios, dominios, marca y API pública por negocio.
+- `supabase/migrations/0005_robustez.sql`: opcional (sin duplicados por doble envío, lista de espera con límites, vencidos, tiempo real).
 - `supabase/seed.sql`: negocio y catálogo iniciales, generado con `npx vite-node scripts/generar-seed.ts`.
 - `supabase/instalar_todo.sql` y `supabase/actualizar_multinegocio.sql`: lo anterior junto, para instalar de cero o
   para actualizar. `supabase/nuevo_negocio.sql` da de alta un restaurante.
@@ -103,7 +128,7 @@ cruzadas) y en el navegador con dos restaurantes simulados.
 1. ~~Conectar Supabase y cliente en la app.~~ Hecho (falta instalar la base, ver arriba).
 2. ~~Login real del chef.~~ Hecho: con la base instalada ya no sirve `admin/admin`.
 3. **Avisos por mail y celular por negocio.** Edge Function que lea `avisos` sin enviar y los mande (Resend o similar).
-   Mientras tanto, el celular del chef se avisa con ntfy (`VITE_NTFY_TOPIC`, ver `.env.example`).
+   Mientras tanto, el celular del chef se avisa con ntfy desde el servidor (ver arriba y `.env.example`).
    WhatsApp automático requiere la API oficial (costo y aprobación); se mantienen los links `wa.me`.
 4. **Seña con Mercado Pago.** Edge Function que crea la preferencia de pago y recibe el webhook para
    marcar `pagos.estado`. Necesita credenciales de Mercado Pago del negocio.

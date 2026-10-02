@@ -13,6 +13,8 @@ import {
   cargarPanelChef,
   crearSolicitudRemota,
   eliminarEventoRemoto,
+  escucharCambios,
+  expirarPedidosVencidos,
   estadoDePedidos,
   responderSolicitudRemota,
 } from "@/lib/backend";
@@ -652,17 +654,21 @@ function useDatosRemotos(rol: Rol, activo: boolean) {
   // Carga inicial, refresco periódico y al volver a la pestaña.
   useEffect(() => {
     if (!activo) return;
-    void refrescar();
+    if (rol === "chef") void expirarPedidosVencidos().then(() => refrescar());
+    else void refrescar();
     const timer = window.setInterval(() => void refrescar(), REFRESCO_MS);
+    // El chef además se entera al instante cuando entra un pedido (si la base lo permite).
+    const dejarDeEscuchar = rol === "chef" ? escucharCambios(() => void refrescar()) : () => {};
     const alVolver = () => {
       if (document.visibilityState === "visible") void refrescar();
     };
     document.addEventListener("visibilitychange", alVolver);
     return () => {
       window.clearInterval(timer);
+      dejarDeEscuchar();
       document.removeEventListener("visibilitychange", alVolver);
     };
-  }, [activo, refrescar]);
+  }, [activo, refrescar, rol]);
 
   const agregarEvento = useCallback(
     async (evento: Omit<Evento, "id">) => {
@@ -685,13 +691,13 @@ function useDatosRemotos(rol: Rol, activo: boolean) {
   const crearSolicitud = useCallback(
     async (solicitud: Omit<Solicitud, "id" | "estado" | "creada">) => {
       const res = await crearSolicitudRemota(solicitud);
-      if ("error" in res) return res.error;
+      if ("error" in res) return { error: res.error };
       guardarMisPedidos([
         ...leerMisPedidos(),
         { ...solicitud, id: res.id, estado: "pendiente", creada: new Date().toISOString() },
       ]);
       await refrescar();
-      return null;
+      return { id: res.id };
     },
     [refrescar],
   );
@@ -714,11 +720,14 @@ function useDatosRemotos(rol: Rol, activo: boolean) {
 
 export type Rol = "chef" | "anfitrion";
 
-/** Todas las acciones devuelven un mensaje de error, o null si salió bien. */
+export type ResultadoPedido = { error: string } | { id: string | null };
+
+/** Las acciones devuelven un mensaje de error, o null si salió bien (salvo crearSolicitud). */
 export type AccionesDatos = {
   agregarEvento: (evento: Omit<Evento, "id">) => Promise<string | null>;
   eliminarEvento: (id: string) => Promise<string | null>;
-  crearSolicitud: (s: Omit<Solicitud, "id" | "estado" | "creada">) => Promise<string | null>;
+  /** Devuelve el id del pedido creado (null en modo demostración) o un mensaje de error. */
+  crearSolicitud: (s: Omit<Solicitud, "id" | "estado" | "creada">) => Promise<ResultadoPedido>;
   responderSolicitud: (
     id: string,
     estado: Exclude<EstadoSolicitud, "pendiente">,
@@ -742,13 +751,14 @@ export function useDatos(
   }
 
   if (modo === "cargando") {
-    const pendiente = async () => "Un momento, estamos conectando.";
+    const mensaje = "Un momento, estamos conectando.";
+    const pendiente = async () => mensaje;
     return {
       modo,
       datos: DATOS_VACIOS,
       agregarEvento: pendiente,
       eliminarEvento: pendiente,
-      crearSolicitud: pendiente,
+      crearSolicitud: async () => ({ error: mensaje }),
       responderSolicitud: pendiente,
       reiniciarDemo: () => {},
     };
@@ -767,7 +777,7 @@ export function useDatos(
     },
     crearSolicitud: async (s) => {
       localRef.current.crearSolicitud(s);
-      return null;
+      return { id: null };
     },
     responderSolicitud: async (id, estado) => localRef.current.responderSolicitud(id, estado),
     reiniciarDemo: () => localRef.current.reiniciarDemo(),

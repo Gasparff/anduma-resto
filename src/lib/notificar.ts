@@ -1,33 +1,12 @@
 /**
- * Avisos al celular del chef cuando entra un pedido nuevo, usando ntfy.sh (gratis, sin cuenta).
- * El chef instala la app "ntfy" y se suscribe al tema configurado en VITE_NTFY_TOPIC.
- * Sin esa variable no se envía nada.
- *
- * Ojo: el tema viaja en el código del navegador, así que sirve para avisos simples. Para algo
- * privado de verdad hay que mandar el aviso desde un servidor (ver docs/BACKEND.md).
+ * Aviso al celular del chef cuando entra un pedido. El envío real lo hace el servidor
+ * (src/lib/avisos-servidor.ts): el navegador solo le cuenta qué pedido se creó. Si falla, no pasa
+ * nada: el pedido ya está guardado en la base.
  */
-import { NEGOCIO_PRINCIPAL, slugDelNegocio } from "@/lib/supabase";
+import { avisarPedido, type AvisoPedido } from "@/lib/avisos-servidor";
 
-const TEMA = (import.meta.env["VITE_NTFY_TOPIC"] as string | undefined)?.trim();
-
-type Aviso = { titulo: string; mensaje: string; clic?: string };
-
-export function avisarAlChef({ titulo, mensaje, clic }: Aviso) {
-  if (!TEMA) return;
-  // El tema es uno solo por instalación: se usa únicamente para el negocio principal, así los
-  // pedidos de un restaurante nunca llegan al celular de otro.
-  if (slugDelNegocio() !== NEGOCIO_PRINCIPAL) return;
-  fetch("https://ntfy.sh", {
-    method: "POST",
-    body: JSON.stringify({
-      topic: TEMA,
-      title: titulo,
-      message: mensaje,
-      priority: 4,
-      tags: ["bell"],
-      ...(clic ? { click: clic } : {}),
-    }),
-  }).catch(() => {
-    // Sin conexión o bloqueado: el pedido ya quedó guardado, el aviso es un extra.
+export function avisarAlChef(aviso: AvisoPedido) {
+  void avisarPedido({ data: aviso }).catch(() => {
+    // Sin conexión con el servidor: el aviso es un extra.
   });
 }

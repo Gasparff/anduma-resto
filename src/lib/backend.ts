@@ -114,6 +114,28 @@ export async function cargarOcupadas(): Promise<Evento[]> {
 }
 
 /** Panel del chef: requiere haber iniciado sesión (lo exige la base con RLS). */
+/** Días hacia atrás que carga el panel (los pendientes se cargan siempre). Evita traer años de historial. */
+const DIAS_DE_HISTORIAL = 90;
+const MAXIMO_DE_FILAS = 500;
+
+function hace(dias: number) {
+  const d = new Date();
+  d.setDate(d.getDate() - dias);
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * Pasa a "cancelada" los pedidos pendientes cuya fecha ya pasó. Función opcional de la base
+ * (migración 0005): si todavía no existe, se ignora sin mostrar nada.
+ */
+export async function expirarPedidosVencidos() {
+  try {
+    await supabase().rpc("expirar_pedidos_vencidos", { p_negocio: (await obtenerIds()).negocio });
+  } catch {
+    // Sin la función opcional o sin conexión: los vencidos igual se muestran como tales.
+  }
+}
+
 export async function cargarPanelChef(): Promise<Datos> {
   // Aunque la base ya limita cada chef a sus negocios, se filtra por el de esta dirección web:
   // quien administre más de uno ve solo el que está abriendo.
@@ -123,14 +145,18 @@ export async function cargarPanelChef(): Promise<Datos> {
       .from("eventos")
       .select("id, fecha, nombre, personas, hora, anfitrion, servicios(codigo), salones(codigo)")
       .eq("negocio_id", negocio)
-      .order("fecha"),
+      .gte("fecha", hace(DIAS_DE_HISTORIAL))
+      .order("fecha")
+      .limit(MAXIMO_DE_FILAS),
     supabase()
       .from("solicitudes")
       .select(
         "id, anfitrion, telefono, fecha, hora, personas, comentario, dietas, presupuesto, estado, creada_en, servicios(codigo), salones(codigo)",
       )
       .eq("negocio_id", negocio)
-      .order("creada_en", { ascending: false }),
+      .or(`estado.eq.pendiente,fecha.gte.${hace(DIAS_DE_HISTORIAL)}`)
+      .order("creada_en", { ascending: false })
+      .limit(MAXIMO_DE_FILAS),
   ]);
   if (ev.error) throw ev.error;
   if (so.error) throw so.error;
@@ -290,4 +316,32 @@ export async function iniciarSesionChef(correo: string, clave: string): Promise<
 
 export async function cerrarSesionChef() {
   await supabase().auth.signOut();
+}
+
+/**
+ * Avisa cuando la base cambia algo del negocio (pedido nuevo, respuesta, evento), para actualizar el
+ * panel al instante. Es un extra: si la base no tiene activado el tiempo real, no llega ningún
+ * aviso y el panel sigue actualizándose cada pocos segundos. Devuelve la función para cancelar.
+ */
+export function escucharCambios(alCambiar: () => void): () => void {
+  try {
+    const canal = supabase()
+      .channel(`panel-${slugDelNegocio()}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "solicitudes" }, alCambiar)
+      .on("postgres_changes", { event: "*", schema: "public", table: "eventos" }, alCambiar)
+      .subscribe();
+    return () => {
+      void supabase().removeChannel(canal);
+    };
+  } catch {
+    return () => {};
+  }
+}
+
+/** Llama a `alSalir` cuando la sesión del chef se cierra (desde otra pestaña o porque venció). */
+export function alCerrarseLaSesion(alSalir: () => void): () => void {
+  const { data } = supabase().auth.onAuthStateChange((evento) => {
+    if (evento === "SIGNED_OUT") alSalir();
+  });
+  return () => data.subscription.unsubscribe();
 }

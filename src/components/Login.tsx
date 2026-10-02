@@ -124,18 +124,18 @@ export function Login({ onChef, onAnfitrion }: Props) {
                   onChef();
                   return;
                 }
-                setError("Usuario o contraseña incorrectos. En la demostración: admin / admin.");
+                setError("Usuario o contraseña incorrectos.");
               }}
             >
               <h2 className="text-2xl">Acceso del restaurante</h2>
               <p className="pb-2 text-sm text-muted-foreground">
-                En la demostración el usuario y la contraseña son <strong>admin</strong>.
+                Ingresá con tu usuario y contraseña.
               </p>
               <Campo
                 label="Usuario"
                 value={usuario}
                 onChange={setUsuario}
-                placeholder="admin"
+                placeholder="Tu usuario"
                 autoFocus
               />
               <Campo
@@ -143,7 +143,7 @@ export function Login({ onChef, onAnfitrion }: Props) {
                 value={clave}
                 onChange={setClave}
                 type="password"
-                placeholder="admin"
+                placeholder="Tu contraseña"
               />
               {error && <MensajeError texto={error} />}
               <button type="submit" className={BOTON_PRIMARIO}>
@@ -228,7 +228,7 @@ function Campo({
         autoFocus={autoFocus}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border bg-background px-4 py-3 outline-none placeholder:text-muted-foreground/70 focus-visible:ring-2 focus-visible:ring-ring"
+        className="w-full rounded-xl border bg-background px-4 py-3 shadow-[0_2px_8px_rgb(0_0_0/0.35)] outline-none placeholder:text-muted-foreground/70 focus-visible:ring-2 focus-visible:ring-ring"
       />
     </label>
   );

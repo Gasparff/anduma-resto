@@ -21,7 +21,7 @@ Una app de **reservas de eventos para Anduma Resto**, el restaurante de un chef 
 - **Precios:** no los tengo, todo figura como "A consultar".
 - **Contacto:** Salta 877, Villa del Rosario, Córdoba 5963. WhatsApp del chef 3573 46-8600  y mail por confirmar (en la demo se usan temporalmente los de Gaspar, 3573 44-3038 y fernandezgaspar13@gmail.com, para probar). Instagram: @andumagastronomia (restaurante) y @andumaeventos (eventos).
 - **Horarios (de la bio de Instagram, a confirmar):** viandas y almuerzos todos los días, cenas de miércoles a sábado.
-- **Marca:** logo con una "A" en letra cursiva color crema sobre fondo marrón con textura de cuero. Paleta: cacao oscuro, cuero (#7a3b21 / #a9522b), crema (#f1e6d0) y latón apagado (#d1a35f). Tema oscuro por defecto. Tipografías: Young Serif (títulos) y Figtree (texto).
+- **Marca:** logo con una "A" en letra cursiva color crema sobre fondo marrón con textura de cuero. Paleta: cacao oscuro, cuero (#7a3b21 / #a9522b), crema (#f1e6d0) y latón apagado (#d1a35f). Tema oscuro por defecto. Tipografías: Cormorant Garamond (títulos) y Jost (texto).
 
 ## Cómo funciona la app
 

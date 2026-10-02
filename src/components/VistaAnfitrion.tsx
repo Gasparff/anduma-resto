@@ -9,7 +9,6 @@ import { EstadoTag } from "@/components/VistaChef";
 import {
   LISTA_SALONES,
   NEGOCIO,
-  SALONES,
   SERVICIOS,
   calcularPresupuesto,
   capacidadMaxima,
@@ -17,7 +16,9 @@ import {
   formatearPesos,
   hoyISO,
   salonOcupado,
+  salonInicial,
   salonSugerido,
+  servicioInicial,
   servicioPorId,
   soloDigitos,
   telefonoWhatsapp,
@@ -25,6 +26,7 @@ import {
   useDatos,
   type SalonId,
   type ServicioId,
+  salonPorId,
 } from "@/lib/eventos";
 import { avisarAlChef } from "@/lib/notificar";
 import { cn } from "@/lib/utils";
@@ -48,9 +50,9 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
   const [enviando, setEnviando] = useState(false);
   const [mes, setMes] = useState(() => new Date());
   const [dia, setDia] = useState<string | null>(null);
-  const [servicio, setServicio] = useState<ServicioId>("cumpleanos");
-  const [salon, setSalon] = useState<SalonId>("eventos");
-  const [hora, setHora] = useState(servicioPorId("cumpleanos").horaSugerida);
+  const [servicio, setServicio] = useState<ServicioId>(servicioInicial);
+  const [salon, setSalon] = useState<SalonId>(salonInicial);
+  const [hora, setHora] = useState(() => servicioPorId(servicioInicial()).horaSugerida);
   const [personas, setPersonas] = useState("");
   const [comentario, setComentario] = useState("");
   const [dietas, setDietas] = useState<string[]>([]);
@@ -82,7 +84,7 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
     setError("");
     if (dia && salonOcupado(datos.eventos, dia, id)) {
       setDia(null);
-      setError(`El ${SALONES[id].nombre} está ocupado ese día. Elegí otra fecha.`);
+      setError(`El ${salonPorId(id).nombre} está ocupado ese día. Elegí otra fecha.`);
     }
   }
 
@@ -90,7 +92,7 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
     setPersonas(valor);
     const n = Number(valor);
     // Si el grupo no entra en el salón elegido, pasamos al salón grande.
-    if (info.usaSalon && n > SALONES[salon].capacidad) cambiarSalon(salonSugerido(n));
+    if (info.usaSalon && n > salonPorId(salon).capacidad) cambiarSalon(salonSugerido(n));
   }
 
   async function enviar(e: React.FormEvent) {
@@ -103,7 +105,7 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
     if (cantidad > max) {
       return setError(
         info.usaSalon
-          ? `El ${SALONES[salon].nombre} admite hasta ${max} personas.`
+          ? `El ${salonPorId(salon).nombre} admite hasta ${max} personas.`
           : `El máximo por pedido es de ${max} viandas.`,
       );
     }
@@ -127,7 +129,7 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
     setEnviando(false);
     if (problema) return setError(problema);
 
-    const lugar = info.usaSalon ? ` en el ${SALONES[salon].nombre}` : "";
+    const lugar = info.usaSalon ? ` en el ${salonPorId(salon).nombre}` : "";
     avisarAlChef({
       titulo: `Pedido nuevo: ${info.singular}`,
       mensaje: `${nombre} (${telefono}) pidió el ${formatearFecha(dia)} a las ${hora}${lugar}, para ${cantidad} ${info.unidad}.${
@@ -171,7 +173,7 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
               <h2 className="text-2xl sm:text-3xl">Fechas disponibles</h2>
               <p className="text-sm text-muted-foreground">
                 {info.usaSalon
-                  ? `Mostramos los días libres del ${SALONES[salon].nombre}.`
+                  ? `Mostramos los días libres del ${salonPorId(salon).nombre}.`
                   : "Las viandas no ocupan salón: podés pedir cualquier día."}
               </p>
             </div>
@@ -320,7 +322,7 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
                   <p className="mt-1 text-xs text-muted-foreground">
                     {cantidad} {info.unidad} × {formatearPesos(presupuesto.unitario)}
                     {presupuesto.recargoSalon > 0 &&
-                      ` + ${formatearPesos(presupuesto.recargoSalon)} del ${SALONES[salon].nombre}`}
+                      ` + ${formatearPesos(presupuesto.recargoSalon)} del ${salonPorId(salon).nombre}`}
                     . Es un valor orientativo: el precio final lo confirma el chef.
                   </p>
                 </div>
@@ -337,15 +339,17 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
                   className="aparece-abajo space-y-2 rounded-xl bg-success/10 p-3 text-success"
                 >
                   <p className="font-medium">¡Listo! Tu pedido quedó pendiente de confirmación.</p>
-                  <a
-                    href={urlWhatsapp(enviada)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                  >
-                    <MessageCircle aria-hidden="true" className="size-4" />
-                    Avisar por WhatsApp al {NEGOCIO.whatsappVisible}
-                  </a>
+                  {NEGOCIO.whatsapp && (
+                    <a
+                      href={urlWhatsapp(enviada)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    >
+                      <MessageCircle aria-hidden="true" className="size-4" />
+                      Avisar por WhatsApp al {NEGOCIO.whatsappVisible}
+                    </a>
+                  )}
                 </div>
               )}
 
@@ -377,7 +381,7 @@ export function VistaAnfitrion({ nombre, telefono, onSalir }: Props) {
                         <p className="text-muted-foreground">
                           {servicioPorId(s.servicio).nombre} · {s.personas}{" "}
                           {servicioPorId(s.servicio).unidad}
-                          {s.salon ? ` · ${SALONES[s.salon].nombre}` : ""}
+                          {s.salon ? ` · ${salonPorId(s.salon).nombre}` : ""}
                         </p>
                       </div>
                       <EstadoTag estado={s.estado} />

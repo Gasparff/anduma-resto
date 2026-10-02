@@ -3,22 +3,59 @@
 Estado: **la app ya sabe hablar con Supabase.** Usa la base apenas existe el negocio en ella; mientras
 no esté instalada, sigue en modo demostración (`localStorage`) y no se rompe nada.
 
-## Instalar la base (una sola vez)
+## Instalar la base
 
-1. En Supabase → **SQL Editor** → New query: pegar todo `supabase/instalar_todo.sql` → **Run**.
-   (Si dice "La base ya está instalada", ya estaba hecho.)
-2. **Authentication → Users → Add user → Create new user**: correo y contraseña del chef,
-   tildando **Auto Confirm User**.
-3. SQL Editor: pegar `supabase/dar_acceso_al_chef.sql`, cambiar `CAMBIAR@correo.com` por ese correo → Run.
+**Base nueva:** en Supabase → **SQL Editor** → pegar todo `supabase/instalar_todo.sql` → **Run**
+(si dice "La base ya está instalada", usar el archivo de actualización).
+
+**Base que ya tenía las migraciones 0001 a 0003:** pegar `supabase/actualizar_multinegocio.sql` → Run.
+Se puede correr más de una vez sin problema y conserva los pedidos existentes.
+
+Después, para el chef:
+
+1. **Authentication → Users → Add user → Create new user**: correo y contraseña, tildando **Auto Confirm User**.
+2. SQL Editor: pegar `supabase/dar_acceso_al_chef.sql`, cambiar `CAMBIAR@correo.com` por ese correo → Run.
    Tiene que mostrar `chefs_con_acceso = 1`.
 
-Listo: el chef entra con su correo y contraseña, y los pedidos de todos los clientes llegan al panel.
-La URL y la clave pública ya están en `src/lib/supabase.ts` (se pueden pisar con `VITE_SUPABASE_URL` y
+La URL y la clave pública ya están en `src/lib/config-supabase.ts` (se pueden pisar con `VITE_SUPABASE_URL` y
 `VITE_SUPABASE_ANON_KEY`). Nunca poner la clave `service_role` en el código.
+
+## Varios restaurantes en la misma plataforma
+
+Una sola aplicación y una sola base; cada restaurante es una "vista" distinta según la dirección web, y
+**ninguno nota a los demás**:
+
+| Capa          | Cómo se separa                                                                                                                                                                                                                                                                                                                                  |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Datos         | Todo cuelga de `negocio_id` con RLS. El público no puede leer `negocios`, `salones` ni `servicios`: solo llama a `obtener_negocio(slug)` y `negocio_por_dominio(host)`, que devuelven **un** negocio (nunca un listado). Cada chef lee y escribe únicamente su negocio.                                                                         |
+| Dirección web | Tabla `dominios` (`reservas.anduma.com`, `anduma.tuplataforma.com`). La app lee el host y resuelve el negocio; un host desconocido muestra una página neutra "Página no encontrada". `?negocio=slug` solo funciona en `localhost` y `*.vercel.app`.                                                                                             |
+| Marca         | `negocios` guarda `color_primario`, `color_acento`, `logo_url`, `favicon_url`, `foto_url`, `descripcion`. Los colores se aplican como variables CSS (`src/lib/marca.ts`); sin logo se muestran las iniciales. El título, la descripción y el ícono (y la vista previa de enlaces) salen **del servidor** según el host (`src/lib/cabecera.ts`). |
+| Sesiones      | El chef solo entra si es miembro **del negocio de esa dirección** (no de cualquiera). La sesión de Supabase vive en el `localStorage` de cada origen, así que no se comparte entre direcciones.                                                                                                                                                 |
+| Catálogo      | Salones, servicios y precios de cada negocio viven en la base y se editan ahí. Las constantes de `src/lib/eventos.ts` son solo el respaldo del modo demostración y la fuente de `seed.sql` del negocio principal.                                                                                                                               |
+
+### Dar de alta un restaurante nuevo
+
+1. **Authentication → Users**: crear el usuario del dueño (con Auto Confirm).
+2. **Vercel → Project → Settings → Domains**: agregar su dirección. Un subdominio tuyo (para comodines
+   `*.tuplataforma.com` Vercel pide usar sus nameservers) o el dominio del restaurante (CNAME a Vercel).
+3. SQL Editor: abrir `supabase/nuevo_negocio.sql`, editar **solo** la sección marcada, y Run.
+   Carga negocio, dominio, dueño, salones y servicios de ejemplo (editables luego en las tablas).
+
+Probado en `supabase/tests/04_multinegocio.sql` (dos negocios y dos chefs, con intentos de lectura y escritura
+cruzadas) y en el navegador con dos restaurantes simulados.
+
+### Limitaciones conocidas de esta etapa
+
+- Los fondos neutros (marrón cálido) son los mismos para todos; la marca cambia colores de acción, acento,
+  logo, textos y fotos. Teñir también los fondos es posible pero queda para más adelante.
+- Aviso al celular (ntfy), mails y Mercado Pago son **por instalación**, no por restaurante: ntfy solo avisa al
+  negocio principal. Hacerlos por negocio requiere Edge Functions (ver abajo).
+- Sin logo propio se usan iniciales; para subir logos desde el panel habría que sumar Supabase Storage.
 
 ## Cómo está conectado
 
-- `src/lib/supabase.ts`: cliente y detección automática del modo (base o demostración).
+- `src/lib/supabase.ts`: cliente, resolución del negocio por dirección web y detección del modo (base o demostración).
+- `src/lib/config-negocio.ts`, `src/lib/marca.ts`, `src/lib/cabecera.ts`: datos del negocio, colores y encabezado.
 - `src/lib/backend.ts`: lecturas y escrituras contra la base, con conversión a los tipos de la app.
 - `src/lib/eventos.ts`: `useDatos("chef" | "anfitrion")` elige solo entre base y demostración.
 - Anfitrión (sin cuenta): ve qué días están ocupados (`fechas_ocupadas`), envía pedidos (`crear_solicitud`)
@@ -33,9 +70,10 @@ La URL y la clave pública ya están en `src/lib/supabase.ts` (se pueden pisar c
   limitada por columnas (el mail de avisos no es público) y arreglo del permiso de `es_miembro`.
 - `supabase/migrations/0003_limites_anti_spam.sql`: límites en `crear_solicitud` (3 pedidos por hora y 5 pendientes
   por teléfono, 40 por hora en todo el negocio, largo máximo de nombre y comentario, fechas razonables).
+- `supabase/migrations/0004_multinegocio.sql`: aislamiento entre negocios, dominios, marca y API pública por negocio.
 - `supabase/seed.sql`: negocio y catálogo iniciales, generado con `npx vite-node scripts/generar-seed.ts`.
-- `supabase/instalar_todo.sql`: todo lo anterior junto, para instalar de cero. Si la base ya estaba instalada,
-  se pegan solo las migraciones nuevas (por ejemplo `0003`).
+- `supabase/instalar_todo.sql` y `supabase/actualizar_multinegocio.sql`: lo anterior junto, para instalar de cero o
+  para actualizar. `supabase/nuevo_negocio.sql` da de alta un restaurante.
 - `supabase/tests/`: pruebas reproducibles (`00_mock_supabase.sql`, `01_escenario.sql`, `02_catalogo_y_estado.sql`).
 
 ### Modelo
@@ -64,14 +102,13 @@ La URL y la clave pública ya están en `src/lib/supabase.ts` (se pueden pisar c
 
 1. ~~Conectar Supabase y cliente en la app.~~ Hecho (falta instalar la base, ver arriba).
 2. ~~Login real del chef.~~ Hecho: con la base instalada ya no sirve `admin/admin`.
-3. **Avisos por mail.** Edge Function que lea `avisos` sin enviar y los mande (Resend o similar).
+3. **Avisos por mail y celular por negocio.** Edge Function que lea `avisos` sin enviar y los mande (Resend o similar).
    Mientras tanto, el celular del chef se avisa con ntfy (`VITE_NTFY_TOPIC`, ver `.env.example`).
    WhatsApp automático requiere la API oficial (costo y aprobación); se mantienen los links `wa.me`.
 4. **Seña con Mercado Pago.** Edge Function que crea la preferencia de pago y recibe el webhook para
    marcar `pagos.estado`. Necesita credenciales de Mercado Pago del negocio.
-5. **Varios negocios por URL** (`/n/<slug>`) y catálogo editable desde la base (hoy el catálogo vive
-   en `src/lib/eventos.ts` y se copia a la base con `seed.sql`).
-6. **Alta de negocios** (onboarding) y cobro de la suscripción.
+5. ~~Varios negocios por dirección web y catálogo en la base.~~ Hecho (ver arriba).
+6. **Panel para que cada dueño edite su catálogo, precios y marca** (hoy se hace por SQL) y **onboarding** con cobro de suscripción.
 
 ## Pendientes de seguridad
 

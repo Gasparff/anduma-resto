@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   MAX_VIANDAS,
-  SALONES,
   aISO,
   calcularPresupuesto,
   formatearPesos,
@@ -9,6 +8,7 @@ import {
   SERVICIOS,
   capacidadMaxima,
   salonOcupado,
+  salonPorId,
   salonSugerido,
   telefonoWhatsapp,
   urlWhatsapp,
@@ -41,12 +41,12 @@ describe("capacidad y salones", () => {
     expect(capacidadMaxima("viandas", undefined)).toBe(MAX_VIANDAS);
   });
   it("los eventos usan la capacidad del salón", () => {
-    expect(capacidadMaxima("casamientos", "resto")).toBe(SALONES.resto.capacidad);
-    expect(capacidadMaxima("casamientos", "eventos")).toBe(SALONES.eventos.capacidad);
+    expect(capacidadMaxima("casamientos", "resto")).toBe(salonPorId("resto").capacidad);
+    expect(capacidadMaxima("casamientos", "eventos")).toBe(salonPorId("eventos").capacidad);
   });
   it("sugiere el salón más chico que alcanza", () => {
-    expect(salonSugerido(SALONES.resto.capacidad)).toBe("resto");
-    expect(salonSugerido(SALONES.resto.capacidad + 1)).toBe("eventos");
+    expect(salonSugerido(salonPorId("resto").capacidad)).toBe("resto");
+    expect(salonSugerido(salonPorId("resto").capacidad + 1)).toBe("eventos");
   });
 });
 
@@ -82,7 +82,7 @@ describe("calcularPresupuesto", () => {
   it("suma precio por persona y recargo del salón", () => {
     const p = calcularPresupuesto("cumpleanos", "eventos", 10)!;
     expect(p.subtotal).toBe(cumple.precioUnitario * 10);
-    expect(p.recargoSalon).toBe(RECARGO_SALON.eventos);
+    expect(p.recargoSalon).toBe(RECARGO_SALON["eventos"]);
     expect(p.total).toBe(p.subtotal + p.recargoSalon);
   });
   it("las viandas no pagan recargo de salón", () => {

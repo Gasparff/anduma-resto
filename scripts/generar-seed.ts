@@ -11,15 +11,24 @@ const arr = (v: readonly string[]) => `array[${v.map(q).join(", ")}]::text[]`;
 const SLUG = "resto-demo";
 const out: string[] = [];
 
-out.push(`-- Datos iniciales del negocio de demostración. Es seguro correrlo más de una vez.
+out.push(`-- Datos iniciales del negocio de demostración (requiere la migración 0004: usa la tabla dominios). Es seguro correrlo más de una vez.
 -- Generado con scripts/generar-seed.ts: no editar a mano, cambiar src/lib/eventos.ts y regenerar.
 `);
-out.push(`insert into negocios (slug, nombre, direccion, whatsapp, email_avisos, instagram, horarios)
-values (${q(SLUG)}, ${q(NEGOCIO.nombre)}, ${q(NEGOCIO.direccion)}, ${q(NEGOCIO.whatsapp)}, ${q(NEGOCIO.email)},
-  ${arr(NEGOCIO.instagram.map((i) => i.usuario))}, ${arr(NEGOCIO.horarios)})
+out.push(`insert into negocios (slug, nombre, direccion, whatsapp, whatsapp_visible, email_avisos, email_contacto,
+  instagram, horarios, descripcion, logo_url, foto_url)
+values (${q(SLUG)}, ${q(NEGOCIO.nombre)}, ${q(NEGOCIO.direccion)}, ${q(NEGOCIO.whatsapp)},
+  ${q(NEGOCIO.whatsappVisible)}, ${q(NEGOCIO.email)}, ${q(NEGOCIO.email)},
+  ${arr(NEGOCIO.instagram.map((i) => i.usuario))}, ${arr(NEGOCIO.horarios)},
+  ${q(NEGOCIO.descripcion ?? "")}, ${q(NEGOCIO.logoUrl ?? "")}, ${q(NEGOCIO.fotoUrl ?? "")})
 on conflict (slug) do update set
   nombre = excluded.nombre, direccion = excluded.direccion, whatsapp = excluded.whatsapp,
-  instagram = excluded.instagram, horarios = excluded.horarios;
+  whatsapp_visible = excluded.whatsapp_visible, email_contacto = excluded.email_contacto,
+  instagram = excluded.instagram, horarios = excluded.horarios, descripcion = excluded.descripcion,
+  logo_url = excluded.logo_url, foto_url = excluded.foto_url;
+`);
+out.push(`insert into dominios (dominio, negocio_id)
+select 'anduma-resto.vercel.app', id from negocios where slug = ${q(SLUG)}
+on conflict (dominio) do nothing;
 `);
 for (const s of LISTA_SALONES) {
   out.push(`insert into salones (negocio_id, codigo, nombre, capacidad, descripcion, recargo)

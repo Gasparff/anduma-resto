@@ -1,6 +1,17 @@
 import { useMemo, useRef } from "react";
-import { SALONES, aISO, hoyISO, salonOcupado, type Evento, type SalonId } from "@/lib/eventos";
+import {
+  LISTA_SALONES,
+  SERVICIOS,
+  aISO,
+  hoyISO,
+  salonOcupado,
+  type Evento,
+  type SalonId,
+} from "@/lib/eventos";
 import { cn } from "@/lib/utils";
+
+// Un color por salón, en el orden en que se muestran (el primero es el más grande).
+const COLORES_SALON = ["bg-primary", "bg-gold", "bg-success", "bg-destructive"];
 
 const DIAS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
@@ -132,14 +143,14 @@ export function Calendario({
               <span className="font-normal">{numero}</span>
               <span className="mt-0.5 flex h-1.5 gap-0.5">
                 {modo === "chef" &&
-                  (["eventos", "resto"] as SalonId[]).map(
-                    (s) =>
-                      salonOcupado(delDia, iso, s) && (
+                  LISTA_SALONES.map(
+                    (s, i) =>
+                      salonOcupado(delDia, iso, s.id) && (
                         <span
-                          key={s}
+                          key={s.id}
                           className={cn(
                             "h-1.5 w-1.5 rounded-full",
-                            s === "eventos" ? "bg-primary" : "bg-gold",
+                            COLORES_SALON[i % COLORES_SALON.length],
                           )}
                         />
                       ),
@@ -164,9 +175,17 @@ export function Calendario({
           </>
         ) : (
           <>
-            <Leyenda color="bg-primary" texto={SALONES.eventos.nombre} />
-            <Leyenda color="bg-gold" texto={SALONES.resto.nombre} />
-            <Leyenda color="bg-muted-foreground" texto="Viandas" />
+            {LISTA_SALONES.map((s, i) => (
+              <Leyenda
+                key={s.id}
+                color={COLORES_SALON[i % COLORES_SALON.length] ?? "bg-primary"}
+                texto={s.nombre}
+              />
+            ))}
+            <Leyenda
+              color="bg-muted-foreground"
+              texto={SERVICIOS.find((x) => !x.usaSalon)?.nombre ?? "Sin salón"}
+            />
           </>
         )}
         <span className="flex items-center gap-1.5">

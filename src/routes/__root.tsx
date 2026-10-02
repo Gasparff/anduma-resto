@@ -80,19 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Resto Demo — Eventos y viandas en Ciudad Demo" },
-      {
-        name: "description",
-        content:
-          "Cocina a pedido para bautismos, cumpleaños, casamientos y viandas en Ciudad Demo, Córdoba. Consultá fechas y reservá.",
-      },
       { name: "theme-color", content: "#1d130f" },
-      { property: "og:title", content: "Resto Demo — Eventos y viandas" },
-      {
-        property: "og:description",
-        content: "Cocina a pedido para tus eventos en Ciudad Demo, Córdoba.",
-      },
-      { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
@@ -106,8 +94,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap",
       },
-      { rel: "icon", href: "/logo.svg", type: "image/svg+xml" },
-      { rel: "apple-touch-icon", href: "/logo.svg" },
     ],
   }),
   shellComponent: RootShell,

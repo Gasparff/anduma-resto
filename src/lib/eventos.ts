@@ -22,11 +22,33 @@ import { useModoBackend, type ModoBackend } from "@/lib/supabase";
 /* Datos del restaurante                                               */
 /* ------------------------------------------------------------------ */
 
-export const NEGOCIO = {
+export type Negocio = {
+  nombre: string;
+  direccion: string;
+  /** Formato internacional para wa.me (54 9 + característica + número). */
+  whatsapp: string;
+  whatsappVisible: string;
+  email: string;
+  instagram: { usuario: string; etiqueta?: string }[];
+  horarios: string[];
+  descripcion?: string;
+  logoUrl?: string;
+  faviconUrl?: string;
+  /** Foto de fondo de la pantalla de ingreso. */
+  fotoUrl?: string;
+  colorPrimario?: string;
+  colorAcento?: string;
+};
+
+/**
+ * Datos del restaurante. Estos valores son los de la demostración y sirven de respaldo; cuando la
+ * base está conectada, `aplicarConfigNegocio` los reemplaza por los del negocio que corresponde
+ * a la dirección web.
+ */
+export const NEGOCIO: Negocio = {
   nombre: "Resto Demo",
   direccion: "Calle Falsa 123, Ciudad Demo, Córdoba",
   // DATOS DE PRUEBA (ficticios, salvo teléfono y mail, que son de Gaspar). Reemplazar por los reales del cliente.
-  // Formato internacional para wa.me (54 9 + característica + número).
   whatsapp: "5493573443038",
   whatsappVisible: "3573 44-3038",
   email: "fernandezgaspar13@gmail.com",
@@ -36,7 +58,10 @@ export const NEGOCIO = {
   ],
   // Horarios ficticios de demostración.
   horarios: ["Viandas todos los días", "Almuerzos todos los días", "Cenas de miércoles a sábado"],
-} as const;
+  descripcion: "Bautismos, cumpleaños, casamientos y viandas en Ciudad Demo.",
+  logoUrl: "/logo.svg",
+  fotoUrl: "/login-fondo.jpg",
+};
 
 export function urlWhatsapp(texto?: string, numero: string = NEGOCIO.whatsapp) {
   const base = `https://wa.me/${numero}`;
@@ -69,7 +94,7 @@ export function telefonoWhatsapp(valor: string) {
 /* Salones y servicios                                                 */
 /* ------------------------------------------------------------------ */
 
-export type SalonId = "eventos" | "resto";
+export type SalonId = string;
 
 export type Salon = {
   id: SalonId;
@@ -94,9 +119,9 @@ export const SALONES: Record<SalonId, Salon> = {
   },
 };
 
-export const LISTA_SALONES: Salon[] = [SALONES.eventos, SALONES.resto];
+export const LISTA_SALONES: Salon[] = Object.values(SALONES);
 
-export type ServicioId = "bautismos" | "cumpleanos" | "casamientos" | "viandas";
+export type ServicioId = string;
 
 export type Servicio = {
   id: ServicioId;
@@ -112,6 +137,8 @@ export type Servicio = {
   usaSalon: boolean;
   unidad: "personas" | "viandas";
   horaSugerida: string;
+  /** Tope por pedido cuando el servicio no usa salón (viandas). */
+  maxPorPedido?: number;
 };
 
 /** Cantidad máxima de viandas por pedido. CONFIRMAR con el chef. */
@@ -191,7 +218,45 @@ export const SERVICIOS: Servicio[] = [
 ];
 
 /** Recargo fijo por usar cada salón (ficticio). */
+const SALON_VACIO: Salon = { id: "", nombre: "", capacidad: 0, descripcion: "" };
+
+/** Salón por id. Si no existe (por ejemplo, de otro negocio) devuelve el primero, nunca undefined. */
+export function salonPorId(id: SalonId | undefined): Salon {
+  return (id === undefined ? undefined : SALONES[id]) ?? LISTA_SALONES[0] ?? SALON_VACIO;
+}
+
 export const RECARGO_SALON: Record<SalonId, number> = { eventos: 150000, resto: 0 };
+
+/* ------------------------------------------------------------------ */
+/* Configuración por negocio                                           */
+/* ------------------------------------------------------------------ */
+
+export type ConfigNegocio = {
+  negocio: Negocio;
+  salones: (Salon & { recargo: number })[];
+  servicios: Servicio[];
+};
+
+/**
+ * Reemplaza los datos del restaurante, los salones y los servicios por los de otro negocio.
+ * Se hace sobre los mismos objetos exportados (no se reasignan) para que todo el código que ya los
+ * importa vea los datos nuevos. Cada página corresponde a un solo negocio, así que se llama una vez
+ * al arrancar, antes de mostrar nada.
+ */
+export function aplicarConfigNegocio(c: ConfigNegocio) {
+  for (const k of Object.keys(NEGOCIO)) delete (NEGOCIO as Record<string, unknown>)[k];
+  Object.assign(NEGOCIO, c.negocio);
+
+  for (const k of Object.keys(SALONES)) delete SALONES[k];
+  for (const k of Object.keys(RECARGO_SALON)) delete RECARGO_SALON[k];
+  for (const { recargo, ...salon } of c.salones) {
+    SALONES[salon.id] = salon;
+    RECARGO_SALON[salon.id] = recargo;
+  }
+  LISTA_SALONES.splice(0, LISTA_SALONES.length, ...Object.values(SALONES));
+
+  SERVICIOS.splice(0, SERVICIOS.length, ...c.servicios);
+}
 
 export function formatearPesos(valor: number) {
   return `$${Math.round(valor).toLocaleString("es-AR")}`;
@@ -218,7 +283,7 @@ export function calcularPresupuesto(
   if (!Number.isFinite(cantidad) || cantidad < 1) return null;
   const info = servicioPorId(servicio);
   const subtotal = info.precioUnitario * cantidad;
-  const recargoSalon = info.usaSalon && salon ? RECARGO_SALON[salon] : 0;
+  const recargoSalon = info.usaSalon && salon ? (RECARGO_SALON[salon] ?? 0) : 0;
   return { unitario: info.precioUnitario, subtotal, recargoSalon, total: subtotal + recargoSalon };
 }
 
@@ -228,13 +293,26 @@ export function servicioPorId(id: ServicioId): Servicio {
 
 /** Capacidad máxima según el servicio y el salón elegido. */
 export function capacidadMaxima(servicio: ServicioId, salon: SalonId | undefined) {
-  if (!servicioPorId(servicio).usaSalon) return MAX_VIANDAS;
-  return SALONES[salon ?? "eventos"].capacidad;
+  const info = servicioPorId(servicio);
+  if (!info.usaSalon) return info.maxPorPedido ?? MAX_VIANDAS;
+  return (SALONES[salon ?? ""] ?? LISTA_SALONES[0])?.capacidad ?? 0;
 }
 
 /** El salón más chico en el que entra el grupo. */
 export function salonSugerido(personas: number): SalonId {
-  return personas > 0 && personas <= SALONES.resto.capacidad ? "resto" : "eventos";
+  const porTamano = [...LISTA_SALONES].sort((a, b) => a.capacidad - b.capacidad);
+  const chico = porTamano.find((x) => personas > 0 && personas <= x.capacidad);
+  return (chico ?? porTamano[porTamano.length - 1])?.id ?? "";
+}
+
+/** Servicio que se muestra elegido al empezar: el primero que usa salón (o el primero a secas). */
+export function servicioInicial(): ServicioId {
+  return (SERVICIOS.find((x) => x.usaSalon) ?? SERVICIOS[0])?.id ?? "";
+}
+
+/** Salón que se muestra elegido al empezar: el más grande. */
+export function salonInicial(): SalonId {
+  return LISTA_SALONES[0]?.id ?? "";
 }
 
 /* ------------------------------------------------------------------ */
@@ -472,7 +550,7 @@ function useDatosLocales() {
         solicitud.salon &&
         salonOcupado(actual.eventos, solicitud.fecha, solicitud.salon)
       ) {
-        return `El ${SALONES[solicitud.salon].nombre} ya tiene un evento ese día.`;
+        return `El ${salonPorId(solicitud.salon).nombre} ya tiene un evento ese día.`;
       }
 
       const solicitudes = actual.solicitudes.map((s) => (s.id === id ? { ...s, estado } : s));

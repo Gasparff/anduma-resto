@@ -6,12 +6,17 @@
  * Ojo: el tema viaja en el código del navegador, así que sirve para avisos simples. Para algo
  * privado de verdad hay que mandar el aviso desde un servidor (ver docs/BACKEND.md).
  */
+import { NEGOCIO_PRINCIPAL, slugDelNegocio } from "@/lib/supabase";
+
 const TEMA = (import.meta.env["VITE_NTFY_TOPIC"] as string | undefined)?.trim();
 
 type Aviso = { titulo: string; mensaje: string; clic?: string };
 
 export function avisarAlChef({ titulo, mensaje, clic }: Aviso) {
   if (!TEMA) return;
+  // El tema es uno solo por instalación: se usa únicamente para el negocio principal, así los
+  // pedidos de un restaurante nunca llegan al celular de otro.
+  if (slugDelNegocio() !== NEGOCIO_PRINCIPAL) return;
   fetch("https://ntfy.sh", {
     method: "POST",
     body: JSON.stringify({

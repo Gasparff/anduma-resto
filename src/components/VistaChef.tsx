@@ -7,13 +7,14 @@ import { PieContacto } from "@/components/PieContacto";
 import {
   LISTA_SALONES,
   NEGOCIO,
-  SALONES,
   SERVICIOS,
   capacidadMaxima,
   formatearFecha,
   hoyISO,
   salonOcupado,
+  salonInicial,
   salonSugerido,
+  servicioInicial,
   servicioPorId,
   formatearPesos,
   telefonoWhatsapp,
@@ -22,6 +23,7 @@ import {
   type SalonId,
   type ServicioId,
   type Solicitud,
+  salonPorId,
 } from "@/lib/eventos";
 import { cn } from "@/lib/utils";
 
@@ -35,8 +37,8 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
   const [dia, setDia] = useState<string | null>(null);
   const [nombre, setNombre] = useState("");
   const [personas, setPersonas] = useState("");
-  const [servicio, setServicio] = useState<ServicioId>("cumpleanos");
-  const [salon, setSalon] = useState<SalonId>("eventos");
+  const [servicio, setServicio] = useState<ServicioId>(servicioInicial);
+  const [salon, setSalon] = useState<SalonId>(salonInicial);
   const [hora, setHora] = useState("21:00");
   const [error, setError] = useState("");
   const [avisos, setAvisos] = useState<Record<string, string>>({});
@@ -61,13 +63,13 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
     if (cantidad > max)
       return setError(
         info.usaSalon
-          ? `El ${SALONES[salon].nombre} admite hasta ${max} personas.`
+          ? `El ${salonPorId(salon).nombre} admite hasta ${max} personas.`
           : `El máximo por pedido es de ${max} viandas.`,
       );
     if (!hora) return setError("Elegí una hora.");
     if (dia < hoyISO()) return setError("No se pueden agendar días pasados.");
     if (info.usaSalon && salonOcupado(datos.eventos, dia, salon))
-      return setError(`El ${SALONES[salon].nombre} ya tiene un evento ese día.`);
+      return setError(`El ${salonPorId(salon).nombre} ya tiene un evento ese día.`);
 
     const problema = await agregarEvento({
       fecha: dia,
@@ -153,7 +155,7 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
                         </p>
                         <p className="text-muted-foreground">
                           {servicioPorId(ev.servicio).nombre}
-                          {ev.salon ? ` · ${SALONES[ev.salon].nombre}` : ""}
+                          {ev.salon ? ` · ${salonPorId(ev.salon).nombre}` : ""}
                         </p>
                       </div>
                       <button
@@ -203,7 +205,7 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
                       value={personas}
                       onChange={(e) => {
                         setPersonas(e.target.value);
-                        if (info.usaSalon && Number(e.target.value) > SALONES[salon].capacidad)
+                        if (info.usaSalon && Number(e.target.value) > salonPorId(salon).capacidad)
                           setSalon(salonSugerido(Number(e.target.value)));
                       }}
                       placeholder={info.unidad === "viandas" ? "Viandas" : "Personas"}
@@ -269,7 +271,7 @@ export function VistaChef({ onSalir }: { onSalir: () => void }) {
                     </div>
                     <p className="mt-2 text-sm">
                       {servicioDe.nombre} · {s.personas} {servicioDe.unidad}
-                      {s.salon ? ` · ${SALONES[s.salon].nombre}` : ""}
+                      {s.salon ? ` · ${salonPorId(s.salon).nombre}` : ""}
                     </p>
                     {s.presupuesto && (
                       <p className="mt-1 text-sm">

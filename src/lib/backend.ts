@@ -11,7 +11,7 @@ import {
   type ServicioId,
   type Solicitud,
 } from "@/lib/eventos";
-import { NEGOCIO_SLUG, supabase } from "@/lib/supabase";
+import { slugDelNegocio, supabase } from "@/lib/supabase";
 
 /* ------------------------------------------------------------------ */
 /* Conversión base -> app (puras, con tests)                           */
@@ -46,10 +46,8 @@ export type FilaSolicitud = {
   salones: Codigo;
 };
 
-/** La base guarda la hora como HH:MM:SS; la app la usa como HH:MM. */
-export function horaCorta(hora: string) {
-  return hora.slice(0, 5);
-}
+export { horaCorta } from "@/lib/config-negocio";
+import { horaCorta } from "@/lib/config-negocio";
 
 /** La base tiene "cancelada"; en la app se muestra como rechazada. */
 export function estadoApp(estado: FilaSolicitud["estado"]): EstadoSolicitud {
@@ -102,7 +100,7 @@ export function mensajeDeError(error: { message?: string } | null | undefined) {
 
 /** Lo que ve el anfitrión: solo qué salón está ocupado qué día, nunca datos de otros clientes. */
 export async function cargarOcupadas(): Promise<Evento[]> {
-  const { data, error } = await supabase().rpc("fechas_ocupadas", { p_slug: NEGOCIO_SLUG });
+  const { data, error } = await supabase().rpc("fechas_ocupadas", { p_slug: slugDelNegocio() });
   if (error) throw error;
   return ((data ?? []) as { fecha: string; salon_codigo: string }[]).map((o) => ({
     id: `ocupado-${o.fecha}-${o.salon_codigo}`,
@@ -117,16 +115,21 @@ export async function cargarOcupadas(): Promise<Evento[]> {
 
 /** Panel del chef: requiere haber iniciado sesión (lo exige la base con RLS). */
 export async function cargarPanelChef(): Promise<Datos> {
+  // Aunque la base ya limita cada chef a sus negocios, se filtra por el de esta dirección web:
+  // quien administre más de uno ve solo el que está abriendo.
+  const { negocio } = await obtenerIds();
   const [ev, so] = await Promise.all([
     supabase()
       .from("eventos")
       .select("id, fecha, nombre, personas, hora, anfitrion, servicios(codigo), salones(codigo)")
+      .eq("negocio_id", negocio)
       .order("fecha"),
     supabase()
       .from("solicitudes")
       .select(
         "id, anfitrion, telefono, fecha, hora, personas, comentario, dietas, presupuesto, estado, creada_en, servicios(codigo), salones(codigo)",
       )
+      .eq("negocio_id", negocio)
       .order("creada_en", { ascending: false }),
   ]);
   if (ev.error) throw ev.error;
@@ -161,7 +164,7 @@ export async function crearSolicitudRemota(
   s: NuevaSolicitud,
 ): Promise<{ id: string } | { error: string }> {
   const { data, error } = await supabase().rpc("crear_solicitud", {
-    p_slug: NEGOCIO_SLUG,
+    p_slug: slugDelNegocio(),
     p_servicio: s.servicio,
     p_salon: s.salon ?? null,
     p_anfitrion: s.anfitrion,
@@ -191,12 +194,21 @@ export async function responderSolicitudRemota(
 type Ids = { negocio: string; servicios: Map<string, string>; salones: Map<string, string> };
 let idsCache: Promise<Ids> | null = null;
 
+/** Ids del negocio, servicios y salones de esta dirección web (se piden una vez; si falla, se reintenta). */
+function obtenerIds(): Promise<Ids> {
+  idsCache ??= cargarIds().catch((e) => {
+    idsCache = null;
+    throw e;
+  });
+  return idsCache;
+}
+
 async function cargarIds(): Promise<Ids> {
   const cli = supabase();
   const { data: neg, error } = await cli
     .from("negocios")
     .select("id")
-    .eq("slug", NEGOCIO_SLUG)
+    .eq("slug", slugDelNegocio())
     .single();
   if (error) throw error;
   const [sv, sa] = await Promise.all([
@@ -215,8 +227,7 @@ async function cargarIds(): Promise<Ids> {
 /** El chef agenda un evento a mano. El índice único de la base impide doble reserva. */
 export async function agregarEventoRemoto(e: Omit<Evento, "id">): Promise<string | null> {
   try {
-    idsCache ??= cargarIds();
-    const ids = await idsCache;
+    const ids = await obtenerIds();
     const { error } = await supabase()
       .from("eventos")
       .insert({
@@ -235,7 +246,6 @@ export async function agregarEventoRemoto(e: Omit<Evento, "id">): Promise<string
     }
     return null;
   } catch (err) {
-    idsCache = null;
     return mensajeDeError(err as { message?: string });
   }
 }
@@ -249,15 +259,17 @@ export async function eliminarEventoRemoto(id: string): Promise<string | null> {
 /* Sesión del chef                                                     */
 /* ------------------------------------------------------------------ */
 
-/** ¿Hay una sesión iniciada cuyo usuario administra este negocio? */
+/** ¿Hay una sesión iniciada cuyo usuario administra el negocio de esta dirección web? */
 export async function chefConSesion(): Promise<boolean> {
   const { data } = await supabase().auth.getSession();
   const uid = data.session?.user.id;
   if (!uid) return false;
+  // Se exige ser miembro de ESTE negocio: administrar otro restaurante no da acceso a este.
   const { data: filas, error } = await supabase()
     .from("miembros")
-    .select("usuario_id")
+    .select("usuario_id, negocios!inner(slug)")
     .eq("usuario_id", uid)
+    .eq("negocios.slug", slugDelNegocio())
     .limit(1);
   return !error && (filas?.length ?? 0) > 0;
 }

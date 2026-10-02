@@ -363,12 +363,43 @@
   animation: dia-pop 0.3s cubic-bezier(0.34, 1.45, 0.5, 1);
 }
 
+/* Marca de cada negocio (ver src/lib/marca.ts): si el negocio define colores, reemplazan a los de la
+   plataforma. Sin colores propios no se aplica nada y queda el diseño original. */
+:root[data-marca-primario] {
+  --primary: var(--marca-primario);
+  --primary-foreground: var(--marca-fg);
+  --ring: var(--marca-primario);
+  --cuero-base: color-mix(in oklab, var(--marca-primario) 85%, black);
+  --cuero-claro: color-mix(in oklab, var(--marca-primario) 88%, white);
+  --cuero-oscuro: color-mix(in oklab, var(--marca-primario) 68%, black);
+}
+
+.dark[data-marca-primario] {
+  --primary: var(--marca-primario-oscuro);
+  --primary-foreground: var(--marca-fg-oscuro);
+  --ring: var(--marca-primario-oscuro);
+}
+
+:root[data-marca-acento] {
+  --accent: var(--marca-acento);
+  --gold: var(--marca-acento);
+}
+
+.dark[data-marca-acento] {
+  --accent: color-mix(in oklab, var(--marca-acento) 85%, white);
+  --gold: color-mix(in oklab, var(--marca-acento) 85%, white);
+}
+
 /* Textura de cuero/tierra, inspirada en el fondo del logo */
 .textura-cuero {
-  background-color: #6b3a24;
+  background-color: var(--cuero-base, #6b3a24);
   background-image:
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.05  0 0 0 0 0.02  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
-    radial-gradient(120% 120% at 20% 0%, #8a4a2d, #5a2f1d 70%);
+    radial-gradient(
+      120% 120% at 20% 0%,
+      var(--cuero-claro, #8a4a2d),
+      var(--cuero-oscuro, #5a2f1d) 70%
+    );
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -5,35 +5,46 @@ import { Login } from "@/components/Login";
 import { VistaAnfitrion } from "@/components/VistaAnfitrion";
 import { VistaChef } from "@/components/VistaChef";
 import { cerrarSesionChef, chefConSesion } from "@/lib/backend";
-import { resolverModo } from "@/lib/supabase";
+import { cabeceraDe, cargarCabecera } from "@/lib/cabecera";
+import { resolverModo, useModoBackend } from "@/lib/supabase";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Resto Demo — Eventos y viandas en Ciudad Demo" },
-      {
-        name: "description",
-        content:
-          "Cocina a pedido para bautismos, cumpleaños, casamientos y viandas en Ciudad Demo, Córdoba. Mirá las fechas libres y pedí la tuya.",
-      },
-      { property: "og:title", content: "Resto Demo — Cocina a pedido para tus eventos" },
-      {
-        property: "og:description",
-        content:
-          "Calendario de fechas libres y pedidos de reserva para bautismos, cumpleaños, casamientos y viandas.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:image", content: "/logo.svg" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  // Título, descripción e ícono según la dirección web (se arman en el servidor; ver src/lib/cabecera.ts).
+  loader: () => cargarCabecera(),
+  head: ({ loaderData }) => cabeceraDe(loaderData),
   component: App,
 });
 
 type Sesion = { rol: "chef" } | { rol: "anfitrion"; nombre: string; telefono: string } | null;
 
+/** Pantalla neutra: sin nombre ni marca de ninguna plataforma ni de otro restaurante. */
+function PaginaNoDisponible({ conexion }: { conexion: boolean }) {
+  return (
+    <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-3 px-6 text-center">
+      <h1 className="text-2xl">
+        {conexion ? "No pudimos cargar la página" : "Página no encontrada"}
+      </h1>
+      <p className="text-sm text-muted-foreground">
+        {conexion
+          ? "Revisá tu conexión e intentá de nuevo."
+          : "La dirección que abriste no existe."}
+      </p>
+      {conexion && (
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="boton-anim mt-2 rounded-full border px-5 py-2 text-sm font-medium"
+        >
+          Reintentar
+        </button>
+      )}
+    </main>
+  );
+}
+
 function App() {
   const [sesion, setSesion] = useState<Sesion>(null);
+  const modo = useModoBackend();
 
   // Con la base conectada, si el chef ya había iniciado sesión en este dispositivo entra directo.
   useEffect(() => {
@@ -51,6 +62,10 @@ function App() {
   function salir() {
     if (sesion?.rol === "chef") void cerrarSesionChef();
     setSesion(null);
+  }
+
+  if (modo === "noencontrado" || modo === "sinconexion") {
+    return <PaginaNoDisponible conexion={modo === "sinconexion"} />;
   }
 
   return (

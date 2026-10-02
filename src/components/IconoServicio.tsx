@@ -1,7 +1,8 @@
-import { Cake, Church, Heart, Package, type LucideIcon } from "lucide-react";
-import type { ServicioId } from "@/lib/eventos";
+import { Cake, Church, Heart, Package, UtensilsCrossed, type LucideIcon } from "lucide-react";
+import { servicioPorId, type ServicioId } from "@/lib/eventos";
 
-const ICONOS: Record<ServicioId, LucideIcon> = {
+// Íconos conocidos por código de servicio; cualquier otro usa uno genérico según la unidad.
+const ICONOS: Record<string, LucideIcon> = {
   bautismos: Church,
   cumpleanos: Cake,
   casamientos: Heart,
@@ -9,6 +10,6 @@ const ICONOS: Record<ServicioId, LucideIcon> = {
 };
 
 export function IconoServicio({ id, className }: { id: ServicioId; className?: string }) {
-  const Icono = ICONOS[id];
+  const Icono = ICONOS[id] ?? (servicioPorId(id).unidad === "viandas" ? Package : UtensilsCrossed);
   return <Icono aria-hidden="true" className={className} strokeWidth={1.5} />;
 }

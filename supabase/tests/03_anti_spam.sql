@@ -1,7 +1,7 @@
 -- Pruebas de la migración 0003. Correr después de 00, 0001, 0002, seed y 0003:
 --   psql -d <base> -f 00_mock_supabase.sql -f ../migrations/0001_esquema_inicial.sql \
 --        -f ../migrations/0002_estado_solicitudes.sql -f ../seed.sql \
---        -f ../migrations/0003_limites_anti_spam.sql -f 03_anti_spam.sql
+--        -f ../migrations/0003_limites_anti_spam.sql -f ../migrations/0004_multinegocio.sql -f 03_anti_spam.sql
 set role anon;
 select 'T1 pedidos 1 a 3 del mismo teléfono entran (esperado 3)', count(*) from (
   select crear_solicitud('resto-demo','cumpleanos','resto','Ana','3573 44-3038','',current_date+d,'21:00',20) from generate_series(10,12) d) x;

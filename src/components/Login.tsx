@@ -23,7 +23,9 @@ export function Login({ onChef, onAnfitrion }: Props) {
   const [error, setError] = useState("");
   const [entrando, setEntrando] = useState(false);
   // Con la base conectada el chef entra con su correo; en modo demostración, con admin/admin.
-  const conBase = useModoBackend() === "remoto";
+  const modoBase = useModoBackend();
+  const conBase = modoBase === "remoto";
+  const instagram = NEGOCIO.instagram[0];
 
   function elegir(siguiente: "chef" | "anfitrion") {
     setModo(siguiente);
@@ -39,12 +41,14 @@ export function Login({ onChef, onAnfitrion }: Props) {
       <div className="grid flex-1 animate-fade-in gap-5 lg:grid-cols-[1.25fr_1fr]">
         <section className="textura-cuero relative isolate flex flex-col justify-between gap-12 overflow-hidden [text-shadow:0_1px_10px_rgb(0_0_0/0.5)] rounded-3xl p-6 text-[#f8eedb] shadow-[var(--shadow-lift)] sm:p-10">
           {/* Foto de fondo: leve desenfoque y poca opacidad del lado izquierdo, donde va el texto */}
-          <img
-            src="/login-fondo.jpg"
-            alt=""
-            aria-hidden="true"
-            className="foto-login pointer-events-none absolute inset-0 -z-10 size-full scale-105 object-cover"
-          />
+          {NEGOCIO.fotoUrl && (
+            <img
+              src={NEGOCIO.fotoUrl}
+              alt=""
+              aria-hidden="true"
+              className="foto-login pointer-events-none absolute inset-0 -z-10 size-full scale-105 object-cover"
+            />
+          )}
           <div className="flex items-center gap-3">
             <Marca tamano={64} className="ring-2 ring-[#f8eedb]/40" />
             <p className="font-display text-2xl">{NEGOCIO.nombre}</p>
@@ -55,38 +59,43 @@ export function Login({ onChef, onAnfitrion }: Props) {
               Cocina a pedido para tus eventos
             </h1>
             <p className="mt-5 max-w-[46ch] text-base leading-relaxed text-[#f8eedb]/90 sm:text-lg">
-              Bautismos, cumpleaños, casamientos y viandas en Ciudad Demo. Mirá qué fechas están
-              libres y pedí la tuya.
+              {NEGOCIO.descripcion ? `${NEGOCIO.descripcion} ` : ""}Mirá qué fechas están libres y
+              pedí la tuya.
             </p>
           </div>
 
           <ul className="space-y-2 text-sm text-[#f8eedb]/90">
-            <li className="flex items-center gap-2">
-              <MapPin aria-hidden="true" className="size-4 shrink-0" />
-              {NEGOCIO.direccion}
-            </li>
-            <li>
-              <a
-                href={urlWhatsapp(`Hola ${NEGOCIO.nombre}, quiero consultar por un evento.`)}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f8eedb]"
-              >
-                <MessageCircle aria-hidden="true" className="size-4 shrink-0" />
-                WhatsApp {NEGOCIO.whatsappVisible}
-              </a>
-            </li>
-            <li>
-              <a
-                href={`https://www.instagram.com/${NEGOCIO.instagram[0].usuario}/`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f8eedb]"
-              >
-                <Instagram aria-hidden="true" className="size-4 shrink-0" />@
-                {NEGOCIO.instagram[0].usuario}
-              </a>
-            </li>
+            {NEGOCIO.direccion && (
+              <li className="flex items-center gap-2">
+                <MapPin aria-hidden="true" className="size-4 shrink-0" />
+                {NEGOCIO.direccion}
+              </li>
+            )}
+            {NEGOCIO.whatsapp && (
+              <li>
+                <a
+                  href={urlWhatsapp(`Hola ${NEGOCIO.nombre}, quiero consultar por un evento.`)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f8eedb]"
+                >
+                  <MessageCircle aria-hidden="true" className="size-4 shrink-0" />
+                  WhatsApp {NEGOCIO.whatsappVisible}
+                </a>
+              </li>
+            )}
+            {instagram && (
+              <li>
+                <a
+                  href={`https://www.instagram.com/${instagram.usuario}/`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f8eedb]"
+                >
+                  <Instagram aria-hidden="true" className="size-4 shrink-0" />@{instagram.usuario}
+                </a>
+              </li>
+            )}
           </ul>
         </section>
 
@@ -216,9 +225,11 @@ export function Login({ onChef, onAnfitrion }: Props) {
             </form>
           )}
 
-          <p className="mt-8 border-t pt-4 text-xs text-muted-foreground">
-            Versión de demostración: los datos se guardan solo en este dispositivo.
-          </p>
+          {modoBase === "local" && (
+            <p className="mt-8 border-t pt-4 text-xs text-muted-foreground">
+              Versión de demostración: los datos se guardan solo en este dispositivo.
+            </p>
+          )}
         </section>
       </div>
     </main>

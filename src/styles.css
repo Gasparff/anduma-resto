@@ -183,7 +183,7 @@
   }
 }
 
-/* Tarjetas de servicios: flip clásico. Al pasar o tocar, el frente gira 180° sobre el eje vertical
+/* Tarjetas de servicios: flip clásico (la clase is-flipped la maneja FlipCards: solo una abierta a la vez). Al pasar o tocar, el frente gira 180° sobre el eje vertical
    y la cara de atrás gira a su posición. Cada cara es un elemento aparte con backface oculta. */
 .flip-scene {
   position: relative;
@@ -224,15 +224,11 @@
   transform: rotateY(180deg);
 }
 
-.flip-scene:hover .flip-front,
-.flip-scene:focus-within .flip-front,
 .flip-scene.is-flipped .flip-front {
   z-index: 0;
   transform: rotateY(180deg);
 }
 
-.flip-scene:hover .flip-back,
-.flip-scene:focus-within .flip-back,
 .flip-scene.is-flipped .flip-back {
   transform: rotateY(0);
 }
@@ -244,8 +240,6 @@
     0 0 14px -2px color-mix(in oklab, var(--accent) 45%, transparent);
 }
 
-.flip-scene:hover .flip-glow,
-.flip-scene:focus-within .flip-glow,
 .flip-scene.is-flipped .flip-glow {
   box-shadow:
     var(--shadow-lift),

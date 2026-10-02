@@ -1,11 +1,19 @@
 import { Check } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { IconoServicio } from "@/components/IconoServicio";
 import { SERVICIOS, textoPrecio, type ServicioId } from "@/lib/eventos";
 import { cn } from "@/lib/utils";
 
 export function FlipCards({ onElegir }: { onElegir?: (id: ServicioId) => void }) {
+  // Una sola tarjeta abierta a la vez: al abrir otra, las demás vuelven a su posición original.
   const [abierta, setAbierta] = useState<ServicioId | null>(null);
+  // Tarjeta fijada con un clic: se queda abierta aunque el mouse salga.
+  const fijada = useRef<ServicioId | null>(null);
+
+  function alternar(id: ServicioId) {
+    fijada.current = fijada.current === id ? null : id;
+    setAbierta(fijada.current);
+  }
 
   return (
     <section className="space-y-4">
@@ -29,11 +37,20 @@ export function FlipCards({ onElegir }: { onElegir?: (id: ServicioId) => void })
               "flip-scene h-[15rem] cursor-pointer rounded-3xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring",
               abierta === s.id && "is-flipped",
             )}
-            onClick={() => setAbierta((prev) => (prev === s.id ? null : s.id))}
+            onPointerEnter={(e) => {
+              if (e.pointerType !== "mouse") return;
+              if (fijada.current !== s.id) fijada.current = null;
+              setAbierta(s.id);
+            }}
+            onPointerLeave={(e) => {
+              if (e.pointerType !== "mouse" || fijada.current === s.id) return;
+              setAbierta((prev) => (prev === s.id ? null : prev));
+            }}
+            onClick={() => alternar(s.id)}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                setAbierta((prev) => (prev === s.id ? null : s.id));
+                alternar(s.id);
               }
             }}
           >

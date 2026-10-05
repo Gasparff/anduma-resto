@@ -2,9 +2,13 @@
 
 App de reservas de eventos para un restaurante (datos de demostración ficticios): bautismos, cumpleaños, casamientos y viandas. Dos vistas: **anfitrión** (pide una fecha) y **chef** (acepta o rechaza, con calendario por salón).
 
-> Estado: **demo sin backend**. Los datos viven en el `localStorage` del navegador. Ver `CONTEXTO.md` para el contexto del proyecto y los próximos pasos (base de datos, login real, avisos, pagos).
+> Estado: **con base de datos (Supabase)**, login real del chef, pedidos compartidos entre dispositivos, varios restaurantes en la misma plataforma y avisos al celular. Si la base todavía no está instalada, funciona en modo demostración. Ver `docs/BACKEND.md`.
 
 Hecho con [Lovable](https://lovable.dev) · React + TanStack Start + Vite + Tailwind + shadcn/ui.
+
+## Correrlo en tu compu (Windows)
+
+Doble clic en **`iniciar.bat`**: descarga la última versión, instala lo que falte, levanta el servidor y abre el navegador. (Necesita [Git](https://git-scm.com) y [Node.js](https://nodejs.org) instalados.)
 
 ## Desarrollo
 
